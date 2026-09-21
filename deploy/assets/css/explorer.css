@@ -1,0 +1,1042 @@
+/* ============================================================================
+   explorer.css — 🧭 EL EXPLORER: la forma del muro de Facebook, con lo nuestro
+   ============================================================================
+   Pedido del jefe (2026-09-16): el área nueva tenía que parecerse al muro de Facebook
+   —«los mismos colores, los mismos diseños, las mismas formas… y también en formato móvil»—.
+
+   CÓMO ESTÁ HECHO (para el que venga después):
+     · Todo vive bajo el prefijo **`exp-`** (muro, publicaciones, columnas) y **`exh-`** (la cabecera).
+       Así este archivo NO puede chocar con `components.css` del resto del sitio: el Explorer solo
+       carga `base.css` (variables y reinicio), `carrito.css` (el cajón del pedido, que es el motor
+       real del ❤️ Me interesa) y ESTE archivo.
+     · Las medidas están calcadas del muro: cabecera de 56 px, tarjetas de 8 px de radio con
+       `0 1px 2px rgba(0,0,0,.1)`, azul `#1877f2`, fondo `#f0f2f5`, gris de texto `#65676b` y
+       separadores `#e4e6eb`. La tipografía es la del sistema (Segoe UI / Roboto / Helvetica),
+       que es la que usa Facebook y no obliga a bajar ninguna fuente.
+     · **Primero el celular**: las reglas de escritorio van al final, dentro de `@media (min-width: …)`.
+       En el celular la barra izquierda se convierte en cajón y abajo aparece la barra de iconos
+       (la misma forma que la app).
+   ============================================================================ */
+
+/* ====== Variables del muro ======
+   ⚠️ EL AZUL (aclaración del jefe, 2026-09-16: *«Facebook usa un azul un poco más oscuro, el azul que
+   tú estás usando es muy claro»*): es el azul ACTUAL de Facebook, `#0866ff` (no el `#1877f2` viejo,
+   que se ve más lavado). El hover va un punto más oscuro y el azul claro es el fondo de las pestañas
+   encendidas. */
+:root, body.exp {
+    --exp-azul:        #0866ff;
+    --exp-azul-osc:    #0757d4;
+    --exp-azul-claro:  #ebf5ff;
+    --exp-negro:       #050505;
+    --exp-gris:        #65676b;
+    --exp-gris-claro:  #bcc0c4;
+    --exp-fondo:       #f0f2f5;
+    --exp-borde:       #ced0d4;
+    --exp-borde-suave: #e4e6eb;
+    --exp-hover:       #f2f2f2;
+    --exp-rojo:        #f3425f;
+    --exp-rojo-osc:    #e41e3f;
+    --exp-verde:       #45bd62;
+    --exp-amarillo:    #f7b928;
+    --exp-sombra:      0 1px 2px rgba(0, 0, 0, .1);
+    --exp-sombra-alta: 0 12px 28px rgba(0, 0, 0, .2), 0 2px 4px rgba(0, 0, 0, .1);
+    --exp-cabecera:    56px;
+}
+
+body.exp {
+    background: var(--exp-fondo);
+    color: var(--exp-negro);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    padding-bottom: 62px;             /* hueco para la barra del celular */
+    -webkit-tap-highlight-color: transparent;
+    /* ⛔ NADA DE ESPACIO A LOS LADOS (queja del jefe, 2026-09-16: *«si mueves hacia la derecha aparece
+       un área, un espacio; no debe aparecer ningún espacio»*). Aunque las piezas del muro ya no se
+       salen del ancho, se cierra la puerta: `overflow-x: clip` corta cualquier desborde horizontal
+       —una barra de desplazamiento lateral es imposible— y, a diferencia de `overflow: hidden`, NO
+       crea un contenedor de desplazamiento, así que la cabecera pegada (`position: sticky`) y los
+       cajones siguen funcionando igual. */
+    overflow-x: clip;
+    max-width: 100%;
+}
+html:has(body.exp) { overflow-x: clip; }
+
+/* El texto que solo leen los lectores de pantalla (no hay `components.css` aquí) */
+body.exp .sr-solo {
+    position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Los iconos: el tamaño lo pone cada sitio donde se usan */
+.exi { width: 20px; height: 20px; display: block; flex: 0 0 auto; }
+
+/* ============================================================================
+   1) LA CABECERA
+   ============================================================================ */
+.exh {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+    height: var(--exp-cabecera); padding: 0 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1), 0 2px 4px rgba(0, 0, 0, .06);
+    max-width: 100vw;   /* nunca más ancha que la pantalla (ver la nota de `.exp-barra`) */
+}
+.exh__izq { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; }
+.exh__der { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+
+/* La marca: el círculo azul con la lupa (el dibujo del favicon del sitio) */
+.exh__logo { flex: 0 0 auto; }
+.exh__logo-circulo {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--exp-azul); color: #fff;
+    display: grid; place-items: center;
+}
+.exh__logo-circulo .exi { width: 22px; height: 22px; }
+.exh__logo:hover .exh__logo-circulo { background: var(--exp-azul-osc); }
+
+/* El buscador: la píldora gris de la izquierda (el motor fuzzy del sitio vive dentro) */
+.exh__buscador {
+    position: relative;
+    display: flex; align-items: center; gap: 8px;
+    flex: 1 1 auto; min-width: 0; max-width: 240px;
+    height: 40px; padding: 0 12px;
+    background: var(--exp-fondo); border-radius: 20px;
+    transition: max-width .2s ease;
+}
+.exh__buscador:focus-within { max-width: 340px; }
+.exh__buscador-ico { color: var(--exp-gris); }
+.exh__buscador input {
+    flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: transparent;
+    font-size: 15px; color: var(--exp-negro);
+}
+.exh__buscador input::placeholder { color: var(--exp-gris); }
+
+/* Los cinco iconos del centro (escritorio) */
+.exh__centro { display: none; }
+
+/* Los iconos de la derecha */
+.exh__caja { position: relative; }
+.exh__ico, .exh__cuenta {
+    position: relative;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--exp-borde-suave); color: var(--exp-negro);
+    display: grid; place-items: center;
+}
+.exh__ico:hover, .exh__cuenta:hover { background: #d8dadf; }
+.exh__cuenta { overflow: hidden; padding: 0; }
+.exh__cuenta .exp-av__img, .exh__cuenta .exp-av__txt { width: 40px; height: 40px; }
+.exh__cuenta-anon { color: var(--exp-negro); }
+.exh__globo {
+    position: absolute; top: -4px; right: -4px;
+    min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+    background: var(--exp-rojo-osc); color: #fff;
+    font-size: 11px; font-weight: 700; line-height: 18px; text-align: center;
+    border: 2px solid #fff; box-sizing: content-box;
+}
+
+/* 🔵 El botón «Entrar» de la cabecera (visitante sin sesión; pedido del jefe: «si no está logueado
+   pues tiene arriba su botón para que se pueda loguear»). */
+.exh__entrar {
+    display: inline-flex; align-items: center; height: 36px; padding: 0 14px;
+    border-radius: 8px; background: var(--exp-azul); color: #fff;
+    font-size: 15px; font-weight: 600; white-space: nowrap;
+}
+.exh__entrar:hover { background: var(--exp-azul-osc); }
+
+/* En el celular la cabecera no puede llevar siete cosas: el cuadrito ⠿ (todas las herramientas)
+   se esconde —en el celular esas mismas herramientas están en el cajón del MENÚ, en la barra de
+   abajo— y el avatar de la cuenta se esconde solo cuando ya hay un botón «Entrar» al lado. */
+@media (max-width: 999px) {
+    .exh__caja--herr { display: none; }
+}
+@media (max-width: 400px) {
+    body.exp-visitante .exh__caja--cuenta { display: none; }
+}
+
+/* Los paneles que se despliegan (herramientas, avisos, cuenta) */
+.exh__panel {
+    position: absolute; right: 0; top: 48px; z-index: 70;
+    width: min(92vw, 340px); max-height: 76vh; overflow-y: auto;
+    padding: 8px; background: #fff; border-radius: 10px;
+    box-shadow: var(--exp-sombra-alta);
+}
+.exh__panel[hidden] { display: none; }
+.exh__panel--ancho { width: min(94vw, 420px); }
+.exh__panel-titulo {
+    margin: 4px 6px 8px; font-size: 17px; font-weight: 700; color: var(--exp-negro);
+}
+.exh__herramientas { display: grid; gap: 2px; }
+
+/* ============================================================================
+   2) EL CUERPO (una sola columna en el celular)
+   ============================================================================ */
+.exp-cuerpo { display: block; padding: 12px 8px 24px; }
+
+/* ============================================================================
+   3) LA BARRA IZQUIERDA (en el celular es el cajón del menú)
+   ============================================================================ */
+.exp-izq {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 130;
+    width: min(86vw, 320px); padding: 12px 8px 24px;
+    background: #fff; overflow-y: auto;
+    transform: translateX(-104%); transition: transform .22s ease;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, .2);
+}
+.exp-izq.is-abierto { transform: none; }
+.exp-izq__yo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px; border-radius: 8px; margin-bottom: 6px;
+}
+.exp-izq__yo:hover { background: var(--exp-hover); }
+.exp-izq__yotxt { min-width: 0; }
+.exp-izq__yotxt b { display: block; font-size: 15px; font-weight: 600; }
+.exp-izq__yotxt i { font-style: normal; font-size: 13px; color: var(--exp-gris); }
+.exp-izq__lista { display: grid; gap: 2px; margin-bottom: 12px; }
+.exp-izq__it {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; padding: 6px 8px; border-radius: 8px;
+    text-align: left; font-size: 15px; font-weight: 500; color: var(--exp-negro);
+    background: none; border: 0;
+}
+.exp-izq__it:hover { background: var(--exp-hover); }
+.exp-izq__txt {
+    flex: 1 1 auto; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.exp-izq__n, .exp-izq__globo {
+    flex: 0 0 auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+    background: var(--exp-rojo-osc); color: #fff;
+    font-size: 12px; font-weight: 700; line-height: 20px; text-align: center;
+}
+.exp-izq__resto { display: grid; gap: 2px; }
+.exp-izq__resto[hidden] { display: none; }
+.exp-izq__titulo {
+    margin: 4px 8px 6px; font-size: 17px; font-weight: 700; color: var(--exp-gris);
+}
+.exp-izq__legal {
+    margin: 8px 8px 0; font-size: 12.5px; line-height: 1.6; color: var(--exp-gris);
+}
+.exp-izq__legal a { color: var(--exp-gris); }
+.exp-izq__legal a:hover { text-decoration: underline; }
+
+/* Los cuadritos de color de cada herramienta (como los accesos de Facebook) */
+.exp-cuadro {
+    flex: 0 0 36px; width: 36px; height: 36px; border-radius: 8px;
+    background: var(--exp-azul); color: #fff;
+    display: grid; place-items: center;
+}
+.exp-cuadro .exi { width: 20px; height: 20px; }
+.exp-cuadro--gris { background: var(--exp-borde-suave); color: var(--exp-negro); }
+.exp-cuadro--letra { font-size: 17px; font-weight: 700; }
+.exp-cuadro--grande { flex-basis: 44px; width: 44px; height: 44px; }
+.exp-cuadro--grande .exi { width: 24px; height: 24px; }
+
+/* ============================================================================
+   4) LA COLUMNA DEL MURO
+   ============================================================================ */
+.exp-muro { max-width: 680px; margin: 0 auto; }
+
+/* --- Filtros (las pestañas del muro) ---
+   ⚠️ `position: relative` NO es decorativo: dentro del carril de filtros va un rótulo oculto
+   (`.sr-solo`, el «Zona» del selector) que es `position: absolute`; sin un contenedor posicionado, su
+   bloque contenedor es la PÁGINA y, como el carril se desliza, el rótulo quedaba en x≈479 y **estiraba
+   todo el documento a 481 px en un teléfono de 390** — eso era lo que hacía que en el celular la
+   pantalla se deslizara al costado (medido con `node __exp_lado.js`). */
+.exp-chips {
+    position: relative;
+    display: flex; align-items: center; gap: 8px;
+    overflow-x: auto; padding: 2px 2px 8px;
+    scrollbar-width: none;
+}
+.exp-chips::-webkit-scrollbar { display: none; }
+.exp-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    flex: 0 0 auto; height: 36px; padding: 0 14px; border-radius: 999px;
+    background: #fff; color: var(--exp-negro);
+    font-size: 15px; font-weight: 600; white-space: nowrap;
+    box-shadow: var(--exp-sombra); border: 0;
+}
+.exp-chip .exi { width: 18px; height: 18px; }
+.exp-chip:hover { background: var(--exp-hover); }
+.exp-chip.is-on { background: var(--exp-azul-claro); color: var(--exp-azul); }
+.exp-chip--x { padding: 0 12px; color: var(--exp-gris); }
+.exp-zona { flex: 0 0 auto; }
+.exp-zona select {
+    height: 36px; padding: 0 12px; border: 0; border-radius: 999px;
+    background: #fff; color: var(--exp-negro);
+    font-size: 15px; font-weight: 600; font-family: inherit;
+    box-shadow: var(--exp-sombra); cursor: pointer;
+}
+
+/* --- La tira de historias --- */
+.exp-historias { margin-bottom: 14px; }
+.exp-historias__tira {
+    position: relative;   /* el mismo motivo que en `.exp-chips`: que ningún rótulo absoluto se escape */
+    display: flex; gap: 8px;
+    overflow-x: auto; padding: 2px 2px 10px;
+    scrollbar-width: none;
+}
+.exp-historias__tira::-webkit-scrollbar { display: none; }
+/* 🧩 LA VERSIÓN QUE REPITE EL MURO (cada 10 publicaciones, como las filas de Facebook): va dentro de
+   una tarjeta blanca con su título discreto, en medio de las publicaciones. */
+.exp-historias--en-muro {
+    background: #fff; border-radius: 8px; box-shadow: var(--exp-sombra);
+    padding: 12px 12px 2px; margin-bottom: 14px;
+}
+.exp-historias__titulo {
+    margin-bottom: 8px; font-size: 15px; font-weight: 700; color: var(--exp-negro);
+}
+.exp-historias--en-muro .exp-historias__tira { padding-bottom: 10px; }
+.exp-hist {
+    position: relative; flex: 0 0 112px; height: 190px;
+    border-radius: 10px; overflow: hidden;
+    background: #d8dadf; box-shadow: var(--exp-sombra);
+}
+.exp-hist:hover { filter: brightness(.96); }
+.exp-hist__foto { position: absolute; inset: 0; display: block; }
+.exp-hist__foto img { width: 100%; height: 100%; object-fit: cover; }
+.exp-hist__velo {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 76px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, .72));
+}
+.exp-hist__nombre {
+    position: absolute; left: 10px; right: 10px; bottom: 9px;
+    color: #fff; font-size: 13px; font-weight: 600; line-height: 1.25;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.exp-av--hist {
+    position: absolute; top: 8px; left: 8px;
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 3px solid var(--exp-azul); overflow: hidden; background: #fff;
+}
+.exp-av--hist .exp-av__img, .exp-av--hist .exp-av__txt { width: 100%; height: 100%; }
+
+/* La primera tarjeta: «Crear historia» (aquí lleva a 🛠️ El maestro) */
+.exp-hist--crear { background: #fff; }
+.exp-hist__crear-foto {
+    position: absolute; top: 0; left: 0; right: 0; height: 148px;
+    display: grid; place-items: center;
+}
+.exp-hist__crear-foto .exp-av__txt, .exp-hist__crear-foto .exp-av__img {
+    width: 84px; height: 84px; border-radius: 50%; font-size: 30px;
+}
+.exp-hist__crear-mas {
+    position: absolute; left: 50%; bottom: 40px; transform: translateX(-50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--exp-azul); color: #fff;
+    border: 4px solid #fff; display: grid; place-items: center;
+}
+.exp-hist__crear-mas .exi { width: 18px; height: 18px; }
+.exp-hist__crear-txt {
+    position: absolute; left: 0; right: 0; bottom: 10px;
+    text-align: center; font-size: 13px; font-weight: 600; color: var(--exp-negro);
+}
+
+/* --- El compositor --- */
+.exp-compositor {
+    background: #fff; border-radius: 8px; box-shadow: var(--exp-sombra);
+    padding: 12px 14px; margin-bottom: 14px;
+}
+.exp-comp__fila { display: flex; align-items: center; gap: 8px; }
+.exp-comp__campo {
+    flex: 1 1 auto; min-width: 0; height: 40px; padding: 0 16px;
+    background: var(--exp-fondo); border: 0; border-radius: 20px;
+    text-align: left; font-size: 16px; color: var(--exp-gris); font-family: inherit;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.exp-comp__campo:hover { background: #e4e6eb; }
+.exp-comp__linea { height: 1px; background: var(--exp-borde-suave); margin: 12px 0; }
+.exp-comp__botones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.exp-comp__btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    height: 40px; border-radius: 6px; font-size: 14.5px; font-weight: 600; color: var(--exp-gris);
+}
+.exp-comp__btn:hover { background: var(--exp-hover); }
+.exp-comp__ico { display: grid; place-items: center; }
+.exp-comp__ico--rojo { color: var(--exp-rojo-osc); }
+.exp-comp__ico--verde { color: var(--exp-verde); }
+.exp-comp__ico--amarillo { color: var(--exp-amarillo); }
+
+/* --- Una publicación --- */
+.exp-posts { display: block; }
+.exp-post {
+    background: #fff; border-radius: 8px; box-shadow: var(--exp-sombra);
+    margin-bottom: 14px; overflow: hidden;
+}
+.exp-post__cabeza { display: flex; align-items: flex-start; gap: 8px; padding: 12px 14px 0; }
+.exp-av {
+    flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; display: block;
+}
+.exp-av__img { width: 40px; height: 40px; object-fit: cover; }
+.exp-av__txt {
+    width: 40px; height: 40px; border-radius: 50%; color: #fff;
+    display: grid; place-items: center; font-size: 17px; font-weight: 700;
+}
+.exp-av--chico, .exp-av--chico .exp-av__txt, .exp-av--chico .exp-av__img { width: 32px; height: 32px; flex-basis: 32px; }
+.exp-av__txt--chico { width: 32px; height: 32px; border-radius: 50%; color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 700; flex: 0 0 32px; }
+/* El visitante sin cuenta: el muñequito gris (una letra suelta parecería el perfil de alguien) */
+.exp-av__vacio {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--exp-borde-suave); color: var(--exp-gris);
+    display: grid; place-items: center;
+}
+.exp-av__vacio .exi { width: 24px; height: 24px; }
+.exp-av--chico .exp-av__vacio { width: 32px; height: 32px; }
+.exp-av--chico .exp-av__vacio .exi { width: 19px; height: 19px; }
+.exp-hist__crear-foto .exp-av__vacio { width: 84px; height: 84px; }
+.exp-hist__crear-foto .exp-av__vacio .exi { width: 48px; height: 48px; }
+
+.exp-post__quien { flex: 1 1 auto; min-width: 0; }
+.exp-post__nombre { font-size: 15px; font-weight: 600; color: var(--exp-negro); }
+.exp-post__nombre:hover { text-decoration: underline; }
+.exp-post__meta {
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    font-size: 13px; color: var(--exp-gris);
+}
+.exp-post__mundo { width: 12px; height: 12px; }
+.exp-post__zona { font-size: 12px; color: var(--exp-gris); }
+
+/* El menú ⋯ */
+.exp-menu { position: relative; flex: 0 0 auto; }
+.exp-menu__btn {
+    width: 36px; height: 36px; border-radius: 50%; color: var(--exp-gris);
+    display: grid; place-items: center; border: 0; background: none;
+}
+.exp-menu__btn:hover { background: var(--exp-hover); }
+.exp-menu__caja {
+    position: absolute; right: 0; top: 38px; z-index: 20;
+    width: 268px; padding: 8px; background: #fff; border-radius: 10px;
+    box-shadow: var(--exp-sombra-alta);
+}
+.exp-menu__caja[hidden] { display: none; }
+.exp-menu__it {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 9px 10px; border-radius: 8px; border: 0; background: none;
+    text-align: left; font-size: 15px; font-weight: 500; color: var(--exp-negro); font-family: inherit;
+}
+.exp-menu__it:hover { background: var(--exp-hover); }
+.exp-menu__it--x { color: var(--exp-gris); }
+
+.exp-post__cuerpo { padding: 8px 14px 0; }
+/* 🛟 Igual que arriba: el texto de una publicación (que viene de la descripción de la tienda) puede
+   traer una URL o una palabra larguísima. Antes de dejar que estire la tarjeta y deslice la pantalla,
+   parte la palabra. */
+.exp-post__texto { font-size: 15px; line-height: 1.45; color: var(--exp-negro); white-space: pre-line; overflow-wrap: anywhere; }
+.exp-post__titulo { font-size: 17px; font-weight: 700; margin: 2px 0 2px; overflow-wrap: anywhere; }
+.exp-post__precio { font-size: 16px; font-weight: 700; color: var(--exp-azul); }
+.exp-post__precio span { font-weight: 500; color: var(--exp-gris); font-size: 14px; }
+.exp-post__mas {
+    margin-top: 2px; padding: 0; border: 0; background: none;
+    font-size: 15px; color: var(--exp-gris); font-family: inherit;
+}
+.exp-post__mas:hover { text-decoration: underline; }
+
+/* Las fotos: una sola, dos, tres o cuatro (como las publicaciones con varias fotos) */
+.exp-fotos { display: grid; gap: 3px; margin-top: 10px; }
+.exp-fotos__f { display: block; overflow: hidden; background: var(--exp-borde-suave); }
+.exp-fotos__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.exp-fotos--1 { grid-template-columns: 1fr; }
+.exp-fotos--1 .exp-fotos__f { max-height: 520px; }
+.exp-fotos--1 .exp-fotos__img { aspect-ratio: 4 / 3; }
+.exp-fotos--2 { grid-template-columns: 1fr 1fr; }
+.exp-fotos--2 .exp-fotos__img { aspect-ratio: 1 / 1.25; }
+.exp-fotos--3 { grid-template-columns: 1.4fr 1fr; grid-template-rows: 1fr 1fr; }
+.exp-fotos--3 .exp-fotos__f--1 { grid-row: 1 / 3; }
+.exp-fotos--3 .exp-fotos__img { aspect-ratio: 1 / 1; height: 100%; }
+.exp-fotos--4 { grid-template-columns: 1fr 1fr; }
+.exp-fotos--4 .exp-fotos__img { aspect-ratio: 1 / 1; }
+
+/* Los números reales de la publicación */
+.exp-post__numeros {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    flex-wrap: wrap;                 /* si el resumen es largo (300 me gusta), la derecha baja de línea */
+    padding: 10px 14px; font-size: 14px; color: var(--exp-gris);
+}
+.exp-post__reac { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+/* El globito del 👍 (azul, como la reacción «Me gusta» del muro) */
+.exp-post__globito {
+    width: 18px; height: 18px; border-radius: 50%; flex: 0 0 18px;
+    background: linear-gradient(#0f6bff, #0866ff); color: #fff;
+    display: grid; place-items: center;
+}
+.exp-post__globito .exi { width: 11px; height: 11px; }
+.exp-post__derecha { display: inline-flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.exp-post__derecha a:hover { text-decoration: underline; }
+.exp-post__vistas, .exp-post__rating { display: inline-flex; align-items: center; gap: 4px; }
+.exp-post__vistas .exi { width: 14px; height: 14px; }
+.exp-post__rating { color: #b45309; font-weight: 600; }
+
+/* La fila de acciones */
+.exp-acciones {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+    padding: 4px 8px 6px; border-top: 1px solid var(--exp-borde-suave);
+}
+.exp-accion {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    height: 36px; border: 0; border-radius: 6px; background: none;
+    font-size: 14.5px; font-weight: 600; color: var(--exp-gris); font-family: inherit;
+    /* 🔴 SIEMPRE EN UNA SOLA FILA (queja del jefe, 2026-09-16: *«el texto me gusta ha quedado en 2
+       filas y debe ser una sola fila siempre, aun cuando tenga 300 likes»*). El rótulo se partía por
+       el espacio entre «Me» y «gusta» cuando la columna se quedaba corta (un número largo, o el
+       celular). Con `nowrap` ni el rótulo ni el número se parten NUNCA. */
+    white-space: nowrap;
+    min-width: 0;
+    /* 🛟 Y `hidden` es la red de seguridad: si algún día el contenido no cupiera, se recorta dentro
+       del botón (el rótulo con puntos suspensivos) en vez de salirse encima del botón de al lado. */
+    overflow: hidden;
+}
+.exp-accion span, .exp-accion__n { white-space: nowrap; }
+/* 🛟 RED DE SEGURIDAD: si algún día el número fuera enorme (cinco cifras), el rótulo se recorta con
+   puntos suspensivos en vez de partirse en dos líneas o salirse del botón. */
+.exp-accion span { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.exp-accion .exi { flex: 0 0 auto; }
+.exp-accion .exi { width: 19px; height: 19px; }
+.exp-accion:hover { background: var(--exp-hover); }
+/* 👍 Encendido: azul, como el «Me gusta» de Facebook (con su numerito al lado) */
+.exp-accion.is-on { color: var(--exp-azul); }
+.exp-accion.is-on .exi { color: var(--exp-azul); }
+.exp-accion__n { font-weight: 600; font-size: 13px; flex: 0 0 auto; }
+.exp-accion__n[hidden] { display: none; }
+
+/* En el celular el hueco manda: letra e icono un punto más chicos y, sobre todo, **el número NO va
+   dentro del botón** (igual que en Facebook): el número ya se lee arriba, en el resumen del muro
+   («Tú y 22 personas más» / «23 personas les gusta»), y así «Me gusta» nunca se parte ni se sale del
+   botón aunque tenga 300. En escritorio, donde sobra sitio, el número sí va al lado del rótulo. */
+@media (max-width: 560px) {
+    .exp-accion { font-size: 13.5px; gap: 5px; padding: 0 2px; }
+    .exp-accion .exi { width: 17px; height: 17px; }
+    .exp-accion__n { display: none !important; }
+}
+@media (max-width: 400px) {
+    .exp-acciones { padding: 4px 2px 6px; gap: 2px; }
+    .exp-accion { font-size: 13px; gap: 4px; padding: 0 1px; }
+    .exp-accion .exi { width: 16px; height: 16px; }
+}
+
+/* 💬 EL BLOQUE DE COMENTARIOS del muro (se abre con «Comentar») · SIN ESTRELLAS: las ⭐ son de las
+   opiniones de la ficha de la tienda, que es otro módulo (orden del jefe, 2026-09-16). */
+.exp-coment { border-top: 1px solid var(--exp-borde-suave); padding: 10px 14px 12px; }
+.exp-coment[hidden] { display: none; }
+.exp-coment__fila { display: flex; gap: 8px; margin-bottom: 8px; }
+.exp-coment__globo {
+    background: var(--exp-fondo); border-radius: 18px; padding: 8px 12px; max-width: 100%;
+}
+.exp-coment__autor { font-size: 13px; font-weight: 600; }
+.exp-coment__texto { font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
+.exp-coment__fecha { font-size: 12px; color: var(--exp-gris); margin-top: 2px; }
+.exp-coment__form { display: flex; align-items: center; gap: 8px; }
+.exp-coment__campo {
+    flex: 1 1 auto; min-width: 0; height: 38px; padding: 0 14px;
+    background: var(--exp-fondo); border: 0; border-radius: 20px;
+    font-size: 15px; font-family: inherit; outline: 0;
+}
+.exp-coment__campo:focus { background: #e4e6eb; }
+/* El avioncito de papel: es el botón que PUBLICA el comentario (el jefe lo vio «como si no sirviera
+   para nada» porque el bloque no estaba activo; ahora sí hace algo). */
+.exp-coment__enviar {
+    width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; border: 0;
+    background: none; color: var(--exp-azul); display: grid; place-items: center;
+}
+.exp-coment__enviar .exi { width: 20px; height: 20px; }
+.exp-coment__enviar:hover { background: var(--exp-azul-claro); }
+.exp-coment__enviar[disabled] { color: var(--exp-gris-claro); background: none; cursor: default; }
+.exp-coment__nota { margin-top: 8px; font-size: 12px; color: var(--exp-gris); }
+.exp-coment__ver {
+    display: inline-block; margin: 4px 0 8px; padding: 0; border: 0; background: none;
+    font-size: 14px; font-weight: 600; color: var(--exp-gris); text-align: left; font-family: inherit;
+}
+button.exp-coment__ver:hover { text-decoration: underline; }
+a.exp-coment__ver { color: var(--exp-azul); }
+a.exp-coment__ver:hover { text-decoration: underline; }
+.exp-post__enlace { border: 0; background: none; padding: 0; font-family: inherit; font-size: 14px; color: var(--exp-gris); }
+.exp-post__enlace:hover { text-decoration: underline; }
+
+/* La lupa del celular (en escritorio el buscador ya está siempre a la vista) */
+.exh__ico--solo-movil { display: grid; }
+@media (min-width: 1000px) { .exh__ico--solo-movil { display: none; } }
+
+/* --- Botones generales --- */
+.exp-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 36px; padding: 0 14px; border: 0; border-radius: 6px;
+    font-size: 15px; font-weight: 600; font-family: inherit;
+}
+.exp-btn--azul { background: var(--exp-azul); color: #fff; }
+.exp-btn--azul:hover { background: var(--exp-azul-osc); }
+.exp-btn--gris { background: var(--exp-borde-suave); color: var(--exp-negro); }
+.exp-btn--gris:hover { background: #d8dadf; }
+.exp-btn--ancho { width: 100%; }
+
+/* --- Cargar más / vacío / pie --- */
+/* --- SCROLL INFINITO (el muro se sigue solo, como Facebook; ya no hay botón «Ver más») --- */
+.exp-mas { margin: 4px 0 18px; }
+.exp-mas__centinela { height: 1px; }
+.exp-mas__cargando {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px; font-size: 14.5px; color: var(--exp-gris);
+}
+.exp-mas__cargando[hidden] { display: none; }
+.exp-mas__giro {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2.5px solid var(--exp-borde-suave); border-top-color: var(--exp-azul);
+    animation: expGiro .8s linear infinite;
+}
+@keyframes expGiro { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .exp-mas__giro { animation-duration: 2s; } }
+.exp-mas__fin { text-align: center; font-size: 14px; color: var(--exp-gris); }
+.exp-mas__fin a { color: var(--exp-azul); font-weight: 600; }
+.exp-vacio {
+    background: #fff; border-radius: 8px; box-shadow: var(--exp-sombra);
+    padding: 28px 18px; text-align: center; margin-bottom: 14px;
+}
+.exp-vacio__ico { font-size: 34px; }
+.exp-vacio__t { font-size: 17px; font-weight: 700; margin: 6px 0 4px; }
+.exp-vacio__s { font-size: 14px; color: var(--exp-gris); margin-bottom: 14px; }
+.exp-pie {
+    text-align: center; font-size: 12.5px; line-height: 1.7; color: var(--exp-gris); padding: 8px 4px 20px;
+}
+.exp-pie a { color: var(--exp-azul); }
+.exp-volver {
+    display: inline-block; margin-bottom: 10px; font-size: 15px; font-weight: 600; color: var(--exp-azul);
+}
+
+/* ============================================================================
+   5) LA COLUMNA DERECHA (publicidad, sugerencias y herramientas)
+   ============================================================================ */
+.exp-der { display: none; }
+.exp-rail__bloque {
+    background: #fff; border-radius: 8px; box-shadow: var(--exp-sombra);
+    padding: 12px; margin-bottom: 14px;
+}
+.exp-rail__titulo { font-size: 17px; font-weight: 700; color: var(--exp-gris); margin-bottom: 10px; }
+.exp-ad { display: block; padding: 6px; border-radius: 8px; margin-bottom: 6px; }
+.exp-ad:hover { background: var(--exp-hover); }
+.exp-ad__foto { display: block; border-radius: 8px; overflow: hidden; }
+.exp-ad__foto img { width: 100%; aspect-ratio: 1.91 / 1; object-fit: cover; }
+.exp-ad__pie { display: block; padding: 8px 4px 2px; }
+.exp-ad__txt { display: block; font-size: 15px; font-weight: 600; color: var(--exp-negro); }
+.exp-ad__dominio { display: block; font-size: 13px; color: var(--exp-gris); }
+/* La publicidad de CASA (nuestras herramientas): cuando no hay anunciantes cargados, el hueco se
+   llena con lo nuestro y NUNCA con un anuncio inventado de un negocio que no existe. */
+.exp-ad--casa { padding: 6px; }
+.exp-ad__foto--casa {
+    display: grid; place-items: center; height: 92px; border-radius: 8px; color: #fff;
+}
+.exp-ad__foto--casa .exi { width: 40px; height: 40px; }
+.exp-ad__sub { display: block; margin-top: 4px; font-size: 13.5px; line-height: 1.4; color: var(--exp-gris); }
+.exp-ad__btn { margin-top: 10px; width: 100%; }
+
+.exp-sug { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; }
+.exp-sug:hover { background: var(--exp-hover); }
+.exp-sug__foto { flex: 0 0 60px; }
+.exp-av__img--sug { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+.exp-sug__foto .exp-av__txt { width: 60px; height: 60px; border-radius: 8px; font-size: 24px; }
+.exp-sug__txt { flex: 1 1 120px; min-width: 0; }
+.exp-sug__nombre { display: block; font-size: 15px; font-weight: 600; color: var(--exp-negro); }
+.exp-sug__meta { font-size: 13px; color: var(--exp-gris); }
+.exp-sug__botones { flex: 1 1 100%; display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; }
+
+.exp-rail__it {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px; border-radius: 8px; text-align: left; width: 100%;
+    border: 0; background: none; font-family: inherit;
+}
+.exp-rail__it:hover { background: var(--exp-hover); }
+.exp-rail__ittxt { min-width: 0; }
+.exp-rail__ittxt b { display: block; font-size: 14.5px; font-weight: 600; color: var(--exp-negro); }
+.exp-rail__ittxt i { font-style: normal; font-size: 12.5px; color: var(--exp-gris); }
+
+/* ============================================================================
+   6) LA BARRA DEL CELULAR Y EL BOTÓN DE PUBLICAR
+   ============================================================================ */
+.exp-barra {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
+    display: flex; align-items: stretch; justify-content: space-around;
+    height: 54px; background: #fff; border-top: 1px solid var(--exp-borde-suave);
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, .08);
+    /* 🔴 ATADO A LA PANTALLA (bug del 2026-09-17): esta barra es `fixed`, y en el celular el navegador
+       la resolvía contra un ancho MAYOR que la pantalla (481 px en un teléfono de 390) porque su
+       contenido no dejaba encogerse; como está fija, estiraba el área de desplazamiento del documento
+       y **toda la página se deslizaba al costado** (medido: 91 px con `node __exp_lado.js`).
+       Con `max-width: 100vw` y los botones con `min-width: 0` la barra mide exactamente la pantalla. */
+    width: 100%;
+    max-width: 100vw;
+}
+.exp-barra__it {
+    position: relative; flex: 1 1 0; min-width: 0;
+    display: grid; place-items: center;
+    color: var(--exp-gris); border: 0; background: none;
+}
+.exp-barra__it .exi { width: 26px; height: 26px; }
+.exp-barra__it.is-on { color: var(--exp-azul); }
+.exp-barra__it.is-on::after {
+    content: ''; position: absolute; left: 20%; right: 20%; bottom: 0;
+    height: 3px; border-radius: 3px 3px 0 0; background: var(--exp-azul);
+}
+
+.exp-fab {
+    position: fixed; right: 14px; bottom: 68px; z-index: 71;
+    width: 48px; height: 48px; border-radius: 50%; border: 0;
+    background: var(--exp-azul); color: #fff;
+    display: grid; place-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+}
+.exp-fab .exi { width: 24px; height: 24px; }
+.exp-fab:hover { background: var(--exp-azul-osc); }
+
+/* ============================================================================
+   7) LOS CAJONES (velo, rubros y publicar) Y EL MENÚ DEL CELULAR
+   ============================================================================ */
+.exp-velo {
+    position: fixed; inset: 0; z-index: 110;
+    background: rgba(0, 0, 0, .5);
+}
+.exp-velo[hidden] { display: none; }
+/* Mientras hay una capa abierta (menú, rubros o publicar), el botón de publicar y la barra del
+   pedido del sitio se esconden: si no, flotan por encima del cajón y estorban. */
+body.exp-capa-abierta .exp-fab,
+body.exp-capa-abierta .cz-fab { display: none !important; }
+
+.exp-cajon {
+    position: fixed; inset: 0; z-index: 140;
+    display: flex; align-items: flex-end; justify-content: center;
+}
+.exp-cajon[hidden] { display: none; }
+.exp-cajon__caja {
+    display: flex; flex-direction: column;
+    width: 100%; max-height: 88vh; background: #fff;
+    border-radius: 14px 14px 0 0; overflow: hidden;
+    box-shadow: var(--exp-sombra-alta);
+}
+.exp-cajon__cabeza {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-bottom: 1px solid var(--exp-borde-suave);
+}
+.exp-cajon__titulo { font-size: 17px; font-weight: 700; }
+.exp-cajon__x {
+    width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--exp-borde-suave);
+    color: var(--exp-negro); display: grid; place-items: center;
+}
+.exp-cajon__buscador { padding: 10px 14px; border-bottom: 1px solid var(--exp-borde-suave); }
+.exp-cajon__buscador input {
+    width: 100%; height: 40px; padding: 0 14px; border: 0; border-radius: 20px;
+    background: var(--exp-fondo); font-size: 16px; font-family: inherit; outline: 0;
+}
+.exp-cajon__cuerpo { overflow-y: auto; padding: 10px 8px 24px; }
+.exp-cajon__nota { font-size: 14px; color: var(--exp-gris); margin: 4px 8px 10px; }
+.exp-cajon__it[hidden] { display: none; }
+
+/* El ninja (el chat de ayuda) aquí hace de Messenger: su botón flotante se esconde
+   porque la cabecera ya tiene su icono y el menú del celular tiene su sitio. */
+body.exp .cbot-fab { display: none !important; }
+body.exp .cbot-panel { z-index: 1200; }
+
+/* ============================================================================
+   8) ESCRITORIO (a partir de aquí se parece al muro de tres columnas)
+   ============================================================================ */
+@media (min-width: 720px) {
+    body.exp { padding-bottom: 0; }
+    .exp-barra { display: none; }
+    .exp-fab { bottom: 20px; right: 20px; }
+    .exp-cuerpo { padding: 16px 16px 30px; }
+    .exp-cajon { align-items: center; }
+    .exp-cajon__caja { max-width: 460px; border-radius: 12px; }
+}
+
+/* ⚠️ AVISO PARA EL QUE VENGA: el paso de «cajón» a «columna» del menú de la izquierda tiene que
+   ocurrir en EL MISMO punto que la rejilla de tres columnas. Si se adelanta (pasó en el primer
+   intento: el menú se volvía columna a los 720 px y la rejilla esperaba a los 1000), en una
+   ventana de 1000 px —donde la barra de desplazamiento deja 985 px de ancho real— la página
+   queda a medio camino: el menú pegado arriba a todo lo ancho y el muro vacío debajo.
+   Por eso TODO el escritorio vive en el mismo `min-width: 1000px`. */
+@media (min-width: 1000px) {
+    .exh { justify-content: space-between; }
+    .exh__izq { flex: 0 1 auto; }
+    .exh__centro {
+        display: flex; align-items: center; justify-content: center;
+        flex: 0 1 620px;
+    }
+    .exh__tab {
+        position: relative; width: 110px; height: 48px; border-radius: 8px;
+        display: grid; place-items: center; color: var(--exp-gris);
+    }
+    .exh__tab:hover { background: var(--exp-hover); }
+    .exh__tab.is-on { color: var(--exp-azul); }
+    .exh__tab.is-on::after {
+        content: ''; position: absolute; left: 6px; right: 6px; bottom: -4px;
+        height: 3px; border-radius: 3px 3px 0 0; background: var(--exp-azul);
+    }
+    .exh__tab .exi { width: 28px; height: 28px; }
+    .exh__tab span { display: none; }
+
+    /* El menú de la izquierda pasa a ser una COLUMNA pegada (ya no cajón) */
+    .exp-izq {
+        position: sticky; top: calc(var(--exp-cabecera) + 8px);
+        left: auto; bottom: auto; width: auto;
+        max-height: calc(100vh - var(--exp-cabecera) - 20px);
+        padding: 4px 4px 20px; border-radius: 0; background: transparent;
+        box-shadow: none; transform: none;
+        overflow-y: auto; overscroll-behavior: contain;
+    }
+    .exp-izq::-webkit-scrollbar { width: 8px; }
+    .exp-izq::-webkit-scrollbar-thumb { background: #ccd0d5; border-radius: 8px; }
+
+    .exp-der {
+        display: block;
+        position: sticky; top: calc(var(--exp-cabecera) + 8px);
+        max-height: calc(100vh - var(--exp-cabecera) - 20px); overflow-y: auto;
+        padding-right: 4px; overscroll-behavior: contain;
+    }
+    .exp-der::-webkit-scrollbar { width: 8px; }
+    .exp-der::-webkit-scrollbar-thumb { background: #ccd0d5; border-radius: 8px; }
+
+    .exp-cuerpo {
+        display: grid; align-items: start;
+        grid-template-columns: 300px minmax(0, 1fr) 320px;
+        /* 📐 EL ANCHO DEL MURO (2026-09-16, a raíz de la queja del jefe de que quedaba «un espacio»):
+           antes eran 1360 px, así que en una pantalla de 1440/1536 las tres columnas no llegaban a los
+           bordes y quedaba franja gris a los lados. Con 1500 el muro OCUPA TODO el ancho en las
+           pantallas normales (y en las muy anchas lo sobrante se reparte a los dos lados, igual que en
+           el muro de Facebook). */
+        gap: 20px; max-width: 1500px; margin: 0 auto;
+    }
+    .exp-muro { margin: 0; max-width: none; }
+}
+
+/* Entre 1000 y 1240 px el muro respira menos (como en Facebook) */
+@media (min-width: 1000px) and (max-width: 1240px) {
+    .exp-cuerpo { grid-template-columns: 260px minmax(0, 1fr) 290px; gap: 14px; }
+}
+
+/* Celular: el buscador se despliega debajo de la cabecera (la lupa del lado derecho) */
+@media (max-width: 999px) {
+    .exh__centro { display: none; }
+    .exh__buscador {
+        position: absolute; left: 0; right: 0; top: 100%;
+        max-width: none; border-radius: 0 0 10px 10px; display: none;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, .12);
+    }
+    .exh.is-buscando .exh__buscador { display: flex; }
+    .exh.is-buscando .exh__logo { visibility: hidden; }
+}
+
+@media (min-width: 1000px) {
+    /* En escritorio el buscador siempre está visible y no hay lupa de desplegar */
+    .exh__buscador { display: flex !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .exp-izq, .exh__buscador { transition: none; }
+}
+
+/* ============================================================================
+   9) EL BUSCADOR PREDICTIVO Y EL MICRÓFONO (los motores del sitio, con la piel del muro)
+   ============================================================================
+   La cabecera del Explorer usa EL MISMO buscador que todo el sitio (`assets/js/buscador_fuzzy.js`
+   + `buscador_voz.js`), pero aquí NO se carga `components.css` (el Explorer tiene su propia piel),
+   así que los estilos de sus desplegables viven aquí, con los colores del muro.
+   ⚠️ Sin este bloque las sugerencias saldrían como texto pelado encima de la página (pasó en la
+   primera prueba: los motores cargaban bien, pero nadie les había puesto la ropa).
+   Los nombres de las clases los pone el JavaScript: `.pred-wrap`, `.pred-sug`, `.pred-item`,
+   `.dropdown-fuzzy__item`, `.btn-voz`, `.voz-aviso`.
+   ============================================================================ */
+.pred-wrap { position: relative; }
+.exh__buscador .pred-wrap { flex: 1 1 auto; display: flex; min-width: 0; }
+.pred-wrap input { width: 100%; }
+.pred-sug {
+    position: absolute; top: calc(100% + 8px); left: 0; right: auto; z-index: 300;
+    width: min(94vw, 420px); min-width: 100%;
+    max-height: 68vh; overflow: hidden auto; text-align: left;
+    background: #fff; border-radius: 10px; box-shadow: var(--exp-sombra-alta);
+}
+.pred-sug__grupo {
+    padding: 9px 12px 3px; background: #f7f8fa;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--exp-gris);
+}
+.pred-item {
+    display: block; padding: 10px 12px;
+    border-top: 1px solid var(--exp-borde-suave);
+    color: var(--exp-negro); font-size: 14.5px; cursor: pointer;
+}
+.pred-item:hover { background: var(--exp-fondo); }
+.dropdown-fuzzy__item.is-sel { background: var(--exp-fondo); box-shadow: inset 3px 0 0 var(--exp-azul); }
+.pred-item .pre { font-weight: 600; }
+.pred-item .meta { display: block; font-size: 12px; color: var(--exp-gris); }
+.pred-item .precio { color: var(--exp-azul); font-weight: 700; }
+.pred-item em { background: #fff3bf; font-style: normal; }
+.pred-vacio { padding: 12px; color: var(--exp-gris); font-size: 13.5px; }
+.dropdown-fuzzy__ver {
+    display: block; padding: 12px;
+    background: #f7f8fa; border-top: 1px solid var(--exp-borde-suave);
+    font-size: 13.5px; font-weight: 700; color: var(--exp-azul);
+}
+.dropdown-fuzzy__ver:hover { background: var(--exp-fondo); }
+
+/* 🎙️ El micrófono (Web Speech API). Si el navegador no lo soporta, el JS no lo pinta. */
+.pred-wrap--voz input { padding-right: 50px; }
+.btn-voz {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 34px; height: 34px; min-width: 34px; padding: 0; z-index: 2;
+    display: flex; align-items: center; justify-content: center;
+    border: 0; border-radius: 50%; background: var(--exp-azul); color: #fff; cursor: pointer;
+}
+.btn-voz svg { display: block; width: 19px; height: 19px; }
+.btn-voz:hover { background: var(--exp-azul-osc); }
+.btn-voz__icono { display: block; pointer-events: none; }
+.btn-voz.is-escuchando { background: #c1121f; animation: expVozLatido 1.1s ease-in-out infinite; }
+@keyframes expVozLatido {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(193, 18, 31, .6); }
+    50%      { box-shadow: 0 0 0 7px rgba(193, 18, 31, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .btn-voz.is-escuchando { animation: none; } }
+input.voz-escuchando::placeholder { color: #c1121f; font-weight: 700; }
+.voz-aviso {
+    position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 320; display: none;
+    padding: 11px 13px; background: #fff; color: var(--exp-negro);
+    border-left: 4px solid var(--exp-azul); border-radius: 10px;
+    box-shadow: var(--exp-sombra-alta); font-size: 14px; line-height: 1.35;
+}
+.voz-aviso--visible { display: block; }
+.voz-aviso--error { border-left-color: #dc2626; }
+.pred-wrap.voz-con-aviso .dropdown-fuzzy { display: none !important; }
+
+/* ====== 🧩 LA PUBLICIDAD DENTRO DEL MURO (cada 3 y luego cada 5 publicaciones) ======
+   Se ve como una publicación pero con la etiqueta «Publicidad» delante, como el anuncio del muro de
+   Facebook: la etiqueta, la imagen del banner de verdad en grande y abajo su título con el dominio. */
+.exp-post--publi { padding-bottom: 4px; }
+.exp-publi__cabeza {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 12px 14px 10px;
+}
+.exp-publi__etiqueta {
+    font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--exp-gris);
+}
+.exp-publi__dominio { font-size: 12.5px; color: var(--exp-gris); }
+.exp-publi__enlace { position: relative; display: block; }
+.exp-publi__enlace img { width: 100%; display: block; }
+.exp-publi__enlace--casa {
+    display: grid; place-items: center; height: 150px; background: var(--exp-azul);
+}
+.exp-publi__enlace--casa .exi { width: 54px; height: 54px; }
+.exp-publi__casa {
+    width: 96px; height: 96px; border-radius: 16px; color: #fff;
+    display: grid; place-items: center;
+}
+.exp-publi__casa .exi { width: 48px; height: 48px; }
+.exp-publi__cta {
+    position: absolute; right: 12px; bottom: 12px;
+    padding: 7px 14px; border-radius: 6px;
+    background: #fff; color: var(--exp-negro);
+    font-size: 14px; font-weight: 600; box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+.exp-publi__pie { padding: 10px 14px 12px; }
+.exp-publi__titulo { display: block; font-size: 16px; font-weight: 700; color: var(--exp-negro); }
+.exp-publi__titulo:hover { text-decoration: underline; }
+.exp-publi__sub { font-size: 14px; color: var(--exp-gris); margin-top: 4px; }
+.exp-publi__btn { margin-top: 10px; }
+
+/* ====== ⬆️ EL BOTÓN DISCRETO DE «REGRESAR A LA PORTADA» ======
+   Aparece solo cuando el visitante ya bajó dos pantallas (lo enciende `explorer.js`): pequeño,
+   medio transparente, abajo a la izquierda (donde no estorban ni el ➕ ni la barra del celular). */
+.exp-portada {
+    position: fixed; left: 14px; bottom: 74px; z-index: 72;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 14px; border-radius: 999px;
+    background: rgba(255, 255, 255, .94); color: var(--exp-negro);
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .22);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .2s ease, transform .2s ease;
+}
+.exp-portada[hidden] { display: none; }
+.exp-portada.is-visible { opacity: .92; transform: none; }
+.exp-portada:hover { opacity: 1; background: #fff; }
+.exp-portada__ico {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--exp-azul); color: #fff;
+    display: grid; place-items: center; font-size: 14px; line-height: 1;
+}
+@media (min-width: 720px) {
+    .exp-portada { bottom: 24px; }
+}
+@media (max-width: 400px) {
+    .exp-portada__txt { display: none; }   /* en pantallas mínimas, solo el círculo con la flecha */
+    .exp-portada { padding: 9px; }
+}
+
+/* ====== 🗂️📰💼 LOS BLOQUES DE CASA (rubros, noticias y empleos) ======
+   Los intercalados que pidió el jefe: tarjetas con la forma de las publicaciones que invitan a pasear
+   por los rubros, a leer las noticias de la zona y a ver los empleos (y, entre ellas, la publicidad). */
+.exp-bloque { padding-bottom: 10px; max-width: 100%; overflow: hidden; }
+/* 🛟 NINGÚN TEXTO DE ESTOS BLOQUES PUEDE ESTIRAR LA PÁGINA: una palabra larguísima (una URL pegada en
+   un titular de noticia, por ejemplo) parte donde haga falta en vez de empujar el bloque y deslizar
+   toda la pantalla al costado. */
+.exp-bloque__txt b, .exp-bloque__txt i,
+.exp-nota__tit, .exp-nota__ent, .exp-nota__pie,
+.exp-aviso__tit, .exp-aviso__meta,
+.exp-rubro__nom { overflow-wrap: anywhere; }
+.exp-bloque__cabeza { display: flex; align-items: center; gap: 10px; padding: 12px 14px 8px; }
+.exp-bloque__ico {
+    flex: 0 0 40px; width: 40px; height: 40px; border-radius: 10px;
+    display: grid; place-items: center; color: #fff; background: var(--exp-azul);
+}
+.exp-bloque__ico .exi { width: 22px; height: 22px; }
+.exp-bloque__txt { min-width: 0; }
+.exp-bloque__txt b { display: block; font-size: 15.5px; font-weight: 700; color: var(--exp-negro); }
+.exp-bloque__txt i { font-style: normal; font-size: 13px; color: var(--exp-gris); }
+.exp-bloque__pie { padding: 4px 14px 2px; }
+
+/* Los rubros: fichas en dos columnas.
+   🔴 `minmax(0, 1fr)` NO es un capricho: con `1fr` a secas, una columna no puede encogerse por debajo
+   del ancho de su contenido más largo (el nombre del rubro, p. ej. «Farmacias / Boticas»), así que la
+   rejilla se estiraba a 412 px en una pantalla de 390 y **arrastraba toda la página al costado**
+   (medido con `node __exp_lado.js`: 91 px de deslizamiento). Con `minmax(0, 1fr)` las columnas sí se
+   encogen y el nombre largo se recorta con puntos suspensivos. */
+.exp-rubros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 2px 14px 10px; }
+.exp-rubro {
+    display: flex; align-items: center; gap: 8px; min-width: 0;
+    padding: 10px; border-radius: 8px; background: var(--exp-fondo);
+    font-size: 14px; color: var(--exp-negro);
+}
+.exp-rubro:hover { background: #e4e6eb; }
+.exp-rubro__ico { font-size: 18px; line-height: 1; flex: 0 0 auto; }
+.exp-rubro__nom {
+    flex: 1 1 auto; min-width: 0; font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.exp-rubro__n { flex: 0 0 auto; font-size: 12.5px; color: var(--exp-gris); }
+
+/* Las noticias: titular + entradilla + pie */
+.exp-nota { display: block; padding: 10px 14px; border-top: 1px solid var(--exp-borde-suave); }
+.exp-nota:hover { background: var(--exp-hover); }
+.exp-nota__tit { display: block; font-size: 15.5px; font-weight: 700; color: var(--exp-negro); line-height: 1.3; }
+.exp-nota__ent { display: block; margin-top: 2px; font-size: 13.5px; color: var(--exp-gris); }
+.exp-nota__pie { display: block; margin-top: 4px; font-size: 12px; color: var(--exp-gris); }
+
+/* Los empleos: titular + datos (rubro, zona, sueldo) */
+.exp-aviso { display: block; padding: 10px 14px; border-top: 1px solid var(--exp-borde-suave); }
+.exp-aviso:hover { background: var(--exp-hover); }
+.exp-aviso__tit { display: block; font-size: 15.5px; font-weight: 700; color: var(--exp-negro); line-height: 1.3; }
+.exp-aviso__meta { display: block; margin-top: 2px; font-size: 13px; color: var(--exp-gris); }
+
+/* ====== El avisito de abajo (agregado al pedido, opinión publicada, errores) ====== */
+.exp-toast {
+    position: fixed; left: 50%; bottom: 76px; z-index: 1300;
+    transform: translate(-50%, 20px);
+    max-width: min(92vw, 460px); padding: 12px 18px;
+    background: #242526; color: #fff; border-radius: 22px;
+    font-size: 14.5px; line-height: 1.35; text-align: center;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease;
+}
+.exp-toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+.exp-toast--malo { background: #b91c1c; }
+@media (min-width: 720px) { .exp-toast { bottom: 24px; } }
+
+/* La impresión: sin barra ni botón flotante */
+@media print {
+    .exp-barra, .exp-fab, .exh, .exp-izq, .exp-der { display: none !important; }
+}

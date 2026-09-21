@@ -1,0 +1,197 @@
+/* ============================================================
+   PLANTILLA C — CATÁLOGO GRILLA (con tabs)
+   ============================================================ */
+body[data-plantilla="C"] .ficha-C { display: block; }
+.ficha-C { display: none; }
+
+.ficha-C__header {
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%);
+    color: #fff; border-radius: var(--radio-borde); padding: 16px;
+    margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+.ficha-C__header-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 12px; margin-bottom: 12px;
+}
+
+.ficha-C__header-info h1 {
+    font-size: 20px; font-weight: 700; line-height: 1.2; margin-bottom: 6px;
+}
+
+.ficha-C__header-meta {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; opacity: 0.95;
+}
+
+.ficha-C__header-meta .badge {
+    background: rgba(255,255,255,0.2); color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.ficha-C__header-meta .rating { color: #fff; }
+.ficha-C__header-meta .estrellas { color: #fbbf24; letter-spacing: 2px; }
+
+.ficha-C__header-logo {
+    flex-shrink: 0; width: 56px; height: 56px; border-radius: 12px;
+    background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; color: #fff;
+}
+
+.ficha-C__header-acciones {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+}
+
+.ficha-C__header-accion {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 8px 4px; background: rgba(255,255,255,0.12);
+    border-radius: 8px; font-size: 11px; font-weight: 600; color: #fff; text-align: center;
+}
+.ficha-C__header-accion:hover { background: rgba(255,255,255,0.25); }
+.ficha-C__header-accion-icono { font-size: 16px; line-height: 1; }
+
+.ficha-C__tabs {
+    display: flex; background: var(--color-fondo-tarjeta);
+    border-radius: var(--radio-borde); padding: 4px;
+    margin-bottom: 16px; box-shadow: var(--sombra-tarjeta); gap: 2px;
+}
+
+.ficha-C__tab {
+    flex: 1; padding: 10px 8px;
+    font-size: 12px; font-weight: 600; color: var(--color-texto-claro);
+    border-radius: 8px; text-align: center; cursor: pointer;
+}
+
+.ficha-C__tab--activo {
+    background: var(--color-acento); color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.ficha-C__panel { display: none; }
+.ficha-C__panel--activo { display: block; }
+
+.ficha-C__panel-productos {
+    background: var(--color-fondo-tarjeta); border-radius: var(--radio-borde);
+    padding: 12px; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+.ficha-C__panel-productos-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+}
+
+.ficha-C__panel-productos-header h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--color-primario);
+}
+
+.ficha-C__panel-productos-orden {
+    font-size: 11px; color: var(--color-texto-claro);
+    background: var(--color-fondo-app); padding: 4px 10px; border-radius: 999px;
+}
+
+.ficha-C__productos-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+
+.ficha-C__producto-card {
+    background: var(--color-fondo-app); border-radius: 10px;
+    overflow: hidden; border: 1px solid var(--color-borde);
+}
+
+.ficha-C__producto-card-img {
+    aspect-ratio: 1; background: #f3f4f6; position: relative;
+}
+
+.ficha-C__producto-card-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.ficha-C__producto-card-destacado {
+    position: absolute; top: 6px; left: 6px;
+    background: var(--color-acento); color: #fff;
+    font-size: 9px; font-weight: 700; padding: 2px 6px;
+    border-radius: 4px; text-transform: uppercase;
+}
+
+.ficha-C__producto-card-body { padding: 8px; }
+
+.ficha-C__producto-card-body h3 {
+    font-size: 12px; font-weight: 600; line-height: 1.3; margin-bottom: 6px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; min-height: 32px;
+}
+
+.ficha-C__producto-card-precio {
+    font-size: 14px; font-weight: 700; color: var(--color-primario); margin-bottom: 2px;
+}
+
+.ficha-C__producto-card-unidad {
+    font-size: 10px; color: var(--color-texto-claro);
+    text-transform: uppercase; letter-spacing: 0.03em;
+}
+
+.ficha-C__panel-info {
+    background: var(--color-fondo-tarjeta); border-radius: var(--radio-borde);
+    padding: 16px; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+.ficha-C__info-bloque {
+    margin-bottom: 16px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-borde);
+}
+.ficha-C__info-bloque:last-child { border: 0; margin: 0; padding: 0; }
+
+.ficha-C__info-bloque-titulo {
+    font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--color-acento);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+
+.ficha-C__info-bloque-contenido {
+    font-size: 14px; line-height: 1.6; white-space: pre-line;
+}
+
+.ficha-C__info-fila {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 6px 0; font-size: 14px;
+}
+
+.ficha-C__info-fila-icono { width: 20px; text-align: center; color: var(--color-primario); flex-shrink: 0; }
+
+.ficha-C__panel-galeria {
+    background: var(--color-fondo-tarjeta); border-radius: var(--radio-borde);
+    padding: 12px; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+/* Mosaico de fotos: 3 columnas en celular y 5 en escritorio (orden del jefe, 2026-09-14 y 2026-09-18),
+   como la galería de la plantilla A. Las fotos se abren en grande al tocarlas (imagen_zoom.js).
+   ✂️ El mismo RECORTE de la A (orden del jefe, 2026-09-18): 9 celdas en móvil (3 × 3) y 25 en PC
+   (5 × 5); las demás siguen viajando en el HTML con `data-galeria-oculta` y el visor las muestra todas. */
+.ficha-C__galeria-mosaic {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 80px; gap: 6px;
+}
+.ficha-C__galeria-mosaic > .ficha-C__galeria-item:nth-child(n+10) { display: none; }
+@media (min-width: 900px) {
+    .ficha-C__galeria-mosaic { grid-template-columns: repeat(5, 1fr); grid-auto-rows: 74px; gap: 8px; }
+    .ficha-C__galeria-mosaic > .ficha-C__galeria-item:nth-child(-n+25) { display: block; }
+    .ficha-C__galeria-mosaic > .ficha-C__galeria-item:nth-child(n+26) { display: none; }
+}
+
+.ficha-C__galeria-item {
+    border-radius: 8px; overflow: hidden; background: #f3f4f6; position: relative;
+}
+
+.ficha-C__galeria-item--grande { grid-column: span 2; grid-row: span 2; }
+.ficha-C__galeria-item img { width: 100%; height: 100%; object-fit: cover; }
+
+.ficha-C__mapa {
+    background: var(--color-fondo-tarjeta); border-radius: var(--radio-borde);
+    overflow: hidden; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+.ficha-C__mapa iframe { width: 100%; height: 200px; border: 0; display: block; }
+
+.ficha-C__mapa-info {
+    padding: 10px 12px; font-size: 13px; color: var(--color-texto);
+    border-top: 1px solid var(--color-borde);
+}
+.ficha-C__mapa-info strong { color: var(--color-primario); }

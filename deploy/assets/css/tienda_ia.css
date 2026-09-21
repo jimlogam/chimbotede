@@ -1,0 +1,759 @@
+/* =====================================================================================
+ * assets/css/tienda_ia.css — 🛠️ «EL MAESTRO» (constructor de tiendas de dechimbote.com)
+ * =====================================================================================
+ * 📱 PÁGINA SOLA DE PANTALLA COMPLETA (2026-09-15). Antes esta página llevaba la cabecera y el
+ * pie del sitio y la barra de escribir iba `position: fixed`: al bajar, el PIE DEL SITIO aparecía
+ * dentro del área de chat. Ahora la página es suya de arriba a abajo:
+ *
+ *      .tia-app  (100dvh, una columna flex)
+ *        ├── .tia-top       cabecera del asistente (no se mueve)
+ *        ├── .tia-chat      LA conversación (es lo único que hace scroll)
+ *        ├── .tia-opciones  los botones del paso (con su propio tope de alto)
+ *        └── .tia-composer  la barra de escribir (no se mueve, y DEBAJO no hay nada)
+ *
+ * Móvil primero (fuente de 16 px: el iPhone no hace zoom al escribir) y los colores de la casa:
+ * granate vino #6d071a, crema #f7efe2, naranja #ea6a12 y azul noche #123c6b.
+ *
+ * Aquí también viven los estilos del dictado (`.cz-dict*`): ese componente los tenía escritos
+ * dentro de `productos.php` y esta página los necesita.
+ *
+ * Guía: GUIA_CONSTRUCTOR_DE_TIENDAS.md
+ * ===================================================================================== */
+
+/* ------------------------------------------------------------------ la página */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* 🔴 `[hidden]` TIENE QUE GANAR SIEMPRE (2026-09-16, lo cazó el jefe en su celular).
+   El navegador esconde lo que lleva el atributo `hidden`… pero SOLO con una regla flojita
+   (`display: none`), y CUALQUIER `display` nuestro la pisa: `.tia-emoji { display: grid }` y
+   `.tia-foto { display: grid }` dejaban a la vista **el cajón de los 48 emojis** y **los dos
+   botones de cámara/galería** en TODOS los pasos (el jefe: *«elimina ese bloque de iconos que
+   tapan toda la pantalla en modo mobile»*). Con `!important` el atributo manda otra vez. */
+[hidden] { display: none !important; }
+
+html { height: 100%; }
+
+body.tia-body {
+  margin: 0;
+  min-height: 100%;
+  background: #ece1cd;
+  color: #2b2118;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  overflow: hidden;               /* la página no scrollea: scrollea la conversación */
+}
+
+.tia-app {
+  --tia-vino: #6d071a;
+  --tia-vino-oscuro: #520512;
+  --tia-naranja: #ea6a12;
+  --tia-crema: #f7efe2;
+  --tia-azul: #123c6b;
+  --tia-borde: #e6dccb;
+  --tia-gris: #6b7280;
+  --tia-verde: #128c7e;
+  height: 100vh;                  /* respaldo para navegadores viejos */
+  height: 100dvh;                 /* el alto REAL del celular (sin la barra del navegador) */
+  max-width: 780px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--tia-crema);
+  color: #2b2118;
+  overflow: hidden;
+  position: relative;
+}
+@media (min-width: 800px) {
+  body.tia-body { background: #e6d9c2; }
+  .tia-app { box-shadow: 0 18px 50px rgba(43, 33, 24, .14); }
+}
+
+/* ------------------------------------------------------------------ la cabecera */
+.tia-top {
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, #7d0a1f, #6d071a);
+  color: #fff;
+  padding: calc(8px + env(safe-area-inset-top)) 10px 0;
+  position: relative;
+  z-index: 5;
+}
+.tia-top__atras {
+  position: absolute;
+  left: 8px;
+  top: calc(11px + env(safe-area-inset-top));
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-size: 19px;
+  text-decoration: none;
+}
+.tia-top__quien {
+  display: flex; align-items: center; gap: 9px;
+  padding: 0 40px 0 40px;
+  min-width: 0;
+}
+.tia-top__emoji {
+  width: 36px; height: 36px; flex: 0 0 36px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .18);
+  font-size: 19px;
+}
+.tia-top__txt { min-width: 0; }
+.tia-top__txt strong { display: block; font-size: 16px; line-height: 1.15; }
+.tia-top__txt small {
+  display: block; font-size: 12.5px; color: #ffd9c9;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tia-top__menu {
+  position: absolute;
+  right: 8px;
+  top: calc(11px + env(safe-area-inset-top));
+  width: 34px; height: 34px;
+  border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  color: #fff; font-size: 20px; line-height: 1;
+  cursor: pointer;
+}
+.tia-menu {
+  position: absolute; right: 8px; top: calc(48px + env(safe-area-inset-top));
+  z-index: 30;
+  background: #fff; border: 1px solid var(--tia-borde); border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(43, 33, 24, .22);
+  padding: 6px; min-width: 230px;
+}
+.tia-menu__item {
+  display: block; width: 100%;
+  text-align: left; text-decoration: none;
+  border: 0; background: transparent; color: #2b2118;
+  font: inherit; font-size: 15.5px;
+  padding: 11px 12px; border-radius: 10px; cursor: pointer;
+}
+.tia-menu__item:hover, .tia-menu__item:focus { background: var(--tia-crema); }
+.tia-barra { height: 4px; background: rgba(255, 255, 255, .18); margin-top: 8px; }
+.tia-barra span {
+  display: block; height: 100%; width: 3%;
+  background: linear-gradient(90deg, #ffb066, #ffd9c9);
+  border-radius: 0 999px 999px 0;
+  transition: width .45s ease;
+}
+
+/* ------------------------------------------------------------------ la conversación */
+.tia-chat {
+  flex: 1 1 auto;
+  min-height: 0;                  /* imprescindible para que el scroll sea del chat y no de la página */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 14px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+.tia-msg { display: flex; gap: 8px; align-items: flex-end; }
+.tia-msg--bot { justify-content: flex-start; }
+.tia-msg--yo  { justify-content: flex-end; }
+.tia-msg__av {
+  width: 30px; height: 30px; flex: 0 0 30px;
+  border-radius: 50%; background: var(--tia-vino); color: #fff;
+  display: grid; place-items: center; font-size: 15px;
+  box-shadow: 0 2px 6px rgba(109, 7, 26, .25);
+}
+.tia-msg__burbuja {
+  max-width: 84%;
+  padding: 11px 14px;
+  border-radius: 18px;
+  font-size: 16px;
+  line-height: 1.5;
+  background: #fff;
+  border: 1px solid #efe6d6;
+  box-shadow: 0 2px 10px rgba(43, 33, 24, .06);
+  overflow-wrap: anywhere;
+}
+.tia-msg--bot .tia-msg__burbuja { border-bottom-left-radius: 6px; }
+.tia-msg--yo .tia-msg__burbuja {
+  background: linear-gradient(180deg, #7d0a1f, #6d071a);
+  border-color: #6d071a;
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+.tia-msg--ancha .tia-msg__burbuja { max-width: 100%; width: 100%; }
+.tia-msg__burbuja strong { font-weight: 700; }
+.tia-msg__burbuja a { color: var(--tia-azul); font-weight: 600; }
+.tia-msg--yo .tia-msg__burbuja a { color: #ffe6c7; }
+.tia-msg__burbuja em { color: var(--tia-gris); font-style: normal; font-size: 14px; }
+.tia-msg--yo .tia-msg__burbuja em { color: #ffd9c9; }
+
+/* 🖼️ la rejilla de fotos dentro de una burbuja (la del dueño, cuando manda varias de golpe) */
+.tia-fotos {
+  display: grid; gap: 5px; margin-top: 6px;
+  grid-template-columns: repeat(3, 1fr);
+}
+.tia-fotos img {
+  width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
+  border-radius: 10px; background: #efe6d6; display: block;
+}
+.tia-fotos--5 img:first-child, .tia-fotos--6 img:first-child { grid-column: span 2; grid-row: span 2; }
+.tia-fotos__nota { display: block; margin-top: 6px; font-size: 13.5px; color: #ffd9c9; }
+
+/* 💭 «escribiendo…» */
+.tia-tip { display: flex; gap: 5px; align-items: center; padding: 12px 15px; }
+.tia-tip span { width: 7px; height: 7px; border-radius: 50%; background: #b9a98f; animation: tiaPulso 1s infinite ease-in-out; }
+.tia-tip span:nth-child(2) { animation-delay: .15s; }
+.tia-tip span:nth-child(3) { animation-delay: .3s; }
+@keyframes tiaPulso { 0%, 100% { opacity: .35; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+
+/* ------------------------------------------------------------------ los avisos del sistema */
+.tia-aviso {
+  flex: 0 0 auto;
+  margin: 10px 12px 0; padding: 11px 13px; border-radius: 12px;
+  background: #fff8ec; border: 1px solid #f0dfc0; font-size: 14.5px; line-height: 1.45;
+}
+.tia-aviso--error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.tia-aviso code { font-size: 13px; }
+
+/* ------------------------------------------------------------------ los botones del paso */
+.tia-opciones {
+  flex: 0 0 auto;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 10px 12px 4px;
+  max-height: 40vh; overflow-y: auto;
+}
+.tia-opciones:empty { display: none; padding: 0; }
+.tia-chip {
+  border: 1.5px solid #e2c9a6;
+  background: #fff;
+  color: var(--tia-vino);
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  box-shadow: 0 1px 3px rgba(43, 33, 24, .06);
+}
+.tia-chip em { font-style: normal; font-weight: 500; color: var(--tia-gris); font-size: 13.5px; }
+.tia-chip--principal {
+  background: linear-gradient(180deg, #f07a22, #ea6a12);
+  border-color: #ea6a12; color: #fff;
+  box-shadow: 0 6px 16px rgba(234, 106, 18, .28);
+}
+/* 📍🆕 EL BOTÓN DE LA UBICACIÓN, EN MORADO (orden del jefe, 2026-09-20): *«que aparezca dentro de la
+   conversación el botón de ubicación y que diga, así, en color morado, "ubicación"»*. Es el PRIMER
+   botón del flujo (el paso `ubicacion` manda `morado: true` en su opción). */
+.tia-chip--morado {
+  background: linear-gradient(180deg, #8b5cf6, #6d28d9);
+  border-color: #6d28d9; color: #fff;
+  box-shadow: 0 6px 16px rgba(109, 40, 217, .32);
+}
+.tia-chip--morado em { color: #ede9fe; }
+.tia-chip:active { transform: scale(.98); }
+@media (max-width: 520px) {
+  .tia-chip { flex: 1 1 100%; justify-content: center; text-align: center; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════════════
+   ✍️ LA BARRA DE ESCRIBIR (2026-09-20 — reescrita para que sea LA MISMA DE LA GUÍA, tal cual)
+   ──────────────────────────────────────────────────────────────────────────────────────────────────
+   · La franja es la del pie de la guía (`.cbot-pie`): **blanca, con su línea arriba** y el contenido
+     centrado; la fila de las cuatro piezas la pinta `.tia-composer__linea` (más abajo).
+   · ⚠️ **`position: relative` es IMPRESCINDIBLE**: aquí se anclan el **menú de la cámara**
+     (`#tiaCamMenu`) y el **aviso del micrófono** (`#tiaVozAviso`), que van `absolute` ENCIMA de la
+     barra. Sin esto el menú se iba a −84 px (fuera de la pantalla) y el dueño tocaba la cámara sin ver
+     nada.
+   · ⛔ SE FUERON (2026-09-20) las reglas del compositor viejo que pisaban al nuevo: el cuadro blanco
+     `.tia-texto`, su `min-height: 50px` y el **`.tia-enviar { min-height: 46px; padding: 10px 18px }`**
+     — ese era el que deformaba el ➤ en un **óvalo de 36 × 46 px**. Solo se quedan `.tia-ayuda` y `.tia-sr`.
+   ══════════════════════════════════════════════════════════════════════════════════════════════════ */
+.tia-composer {
+  flex: 0 0 auto;
+  position: relative;         /* ⚠️ ancla el menú de la cámara y el aviso del micrófono (¡no quitar!) */
+  background: #fff;           /* la franja blanca del pie de la guía */
+  border-top: 1px solid var(--tia-borde);
+  padding: 6px 7px calc(6px + env(safe-area-inset-bottom));
+  box-shadow: none;
+}
+.tia-composer__caja {
+  max-width: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  position: relative;         /* para el aviso del dictado (se pinta encima de la barra) */
+}
+.tia-ayuda {
+  max-width: 100%; margin: 7px 2px 0; font-size: 13px; color: var(--tia-gris); text-align: center;
+  min-height: 1em;
+}
+.tia-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ------------------------------------------------------------------ botones */
+.tia-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 11px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--tia-borde);
+  background: #fff;
+  color: #2b2118;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tia-btn--principal { background: linear-gradient(180deg, #7d0a1f, #6d071a); border-color: #6d071a; color: #fff; }
+.tia-btn--camara  { background: #fff5e9; border-color: #f0c9a0; color: #8a3b00; }
+.tia-btn--galeria { background: #eef4ff; border-color: #c7d7f5; color: var(--tia-azul); }
+.tia-btn--wa { background: #128c7e; border-color: #128c7e; color: #fff; }
+/* 🔴 EL BOTÓN ROJO DE GUARDAR LOS DATOS: tiene que SALTAR a la vista (orden del jefe: *«el botón que
+   dice guardar en mi WhatsApp… debe ser llamativo, color rojo; es muy importante que el usuario
+   guarde su usuario y su contraseña»*). Late despacio para que nadie lo pierda. */
+.tia-btn--rojo {
+  background: linear-gradient(180deg, #e11d48, #be123c);
+  border-color: #be123c; color: #fff;
+  font-size: 17px; font-weight: 800;
+  box-shadow: 0 8px 22px rgba(190, 18, 60, .32);
+  animation: tiaLatido 2.2s infinite ease-in-out;
+}
+@keyframes tiaLatido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+.tia-btn:active { transform: scale(.985); }
+.tia-btn[disabled] { opacity: .5; }
+
+/* 📷 La tira de fotos que ya subió (para aprovecharlas en el producto) */
+.tia-slide__tit { margin: 0 0 8px; font-size: 15px; font-weight: 600; color: var(--tia-vino); }
+.tia-slide__tira {
+  display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+}
+.tia-slide__foto {
+  flex: 0 0 auto; width: 96px; height: 96px; padding: 0;
+  border: 2px solid #e2c9a6; border-radius: 12px; background: #fff;
+  cursor: pointer; overflow: hidden;
+}
+.tia-slide__foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tia-slide__foto:active { transform: scale(.97); border-color: var(--tia-naranja); }
+
+/* 📷 Los DOS botones de la foto, siempre juntos y a lo ancho */
+.tia-foto { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 6px; }
+.tia-foto .tia-btn { min-height: 46px; font-size: 15px; padding: 10px 6px; border-radius: 14px; }
+.tia-wa-ico { display: inline-flex; width: 20px; height: 20px; }
+.tia-wa-ico svg { width: 20px; height: 20px; }
+
+/* 🔑 Los datos para entrar (usuario y contraseña) */
+.tia-cuenta {
+  margin-top: 12px; padding: 12px 14px; border-radius: 14px;
+  background: #fffaf0; border: 1px dashed #e2c9a6;
+}
+.tia-cuenta h4 { margin: 0 0 8px; font-size: 16px; color: var(--tia-vino); }
+.tia-cuenta__fila {
+  display: flex; justify-content: space-between; gap: 10px; margin: 4px 0;
+  padding: 8px 10px; background: #fff; border-radius: 10px; border: 1px solid #efe3d0; font-size: 16px;
+}
+.tia-cuenta__fila span { color: var(--tia-gris); font-size: 14px; }
+.tia-cuenta__fila strong { letter-spacing: .5px; }
+.tia-cuenta__nota { font-size: 13.5px; color: var(--tia-gris); margin: 8px 0 0; }
+
+/* 🎉 La tarjeta del producto que acaba de quedar en línea */
+.tia-prod {
+  display: flex; gap: 12px; align-items: center;
+  padding: 10px; border-radius: 14px; background: #f0fdf4; border: 1px solid #bbf7d0;
+}
+.tia-prod img { width: 76px; height: 76px; object-fit: cover; border-radius: 12px; }
+.tia-prod strong { font-size: 16.5px; color: #14532d; }
+.tia-prod small { color: #15803d; }
+
+/* ------------------------------------------------------------------ el resumen final */
+.tia-resumen__tit { margin: 0 0 8px; font-size: 17px; color: var(--tia-vino); }
+.tia-resumen__fila { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px dashed #efe3d0; font-size: 15.5px; }
+.tia-resumen__fila:last-of-type { border-bottom: 0; }
+.tia-resumen__et { flex: 0 0 92px; color: var(--tia-gris); font-size: 14px; }
+.tia-resumen__va { flex: 1; }
+.tia-resumen__fotos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
+.tia-resumen__fotos img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; }
+.tia-resumen__nota { font-size: 14px; color: var(--tia-gris); margin: 10px 0 0; }
+
+/* ------------------------------------------------------------------ el festejo (publicada) */
+.tia-festejo { text-align: center; }
+.tia-festejo__emoji { font-size: 44px; line-height: 1; }
+.tia-festejo h3 { margin: 6px 0; color: var(--tia-vino); font-size: 20px; }
+.tia-festejo p { margin: 5px 0; font-size: 15.5px; }
+.tia-festejo__url { font-size: 15px; overflow-wrap: anywhere; }
+.tia-festejo__botones { display: grid; gap: 8px; margin-top: 12px; }
+.tia-festejo__botones .tia-btn { width: 100%; }
+
+/* ------------------------------------------------------------------ la puerta (sin sesión) */
+.tia-puerta {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 24px 16px 50px;
+  font-size: 16px;
+}
+.tia-puerta__caja {
+  background: #fff;
+  border: 1px solid var(--tia-borde);
+  border-radius: 20px;
+  padding: 22px 18px;
+  box-shadow: 0 10px 30px rgba(109, 7, 26, .08);
+}
+.tia-puerta__emoji { font-size: 44px; line-height: 1; }
+.tia-puerta__tit { font-size: 25px; line-height: 1.2; margin: 8px 0 10px; color: var(--tia-vino); }
+.tia-puerta__sub { font-size: 16.5px; line-height: 1.55; margin: 0 0 14px; }
+.tia-puerta__lista { list-style: none; padding: 0; margin: 0 0 14px; }
+.tia-puerta__lista li {
+  padding: 9px 0 9px 2px; border-bottom: 1px dashed var(--tia-borde); font-size: 16px; line-height: 1.45;
+}
+.tia-puerta__lista li:last-child { border-bottom: 0; }
+.tia-puerta__botones { display: grid; gap: 10px; margin: 16px 0 12px; }
+.tia-puerta__pie { font-size: 14.5px; color: var(--tia-gris); margin: 10px 0 0; }
+.tia-puerta__pie a { color: var(--tia-vino); }
+
+/* ------------------------------------------------------------------ 🎙️ el dictado (componente del sitio) */
+/* El 🎙️ vive en la MISMA línea del campo (dictado_voz.js lo pinta después del textarea): aquí se
+   le quita el aire de más para que quepa junto al botón Enviar incluso en un celular chico. */
+.tia-composer__linea .cz-dict { flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 0; }
+/* 🎙️ MODO SOLO ÍCONO (el micrófono, como en WhatsApp): sin texto «dictar» (orden del jefe). */
+.tia-composer .cz-dict__btn--icono {
+  width: 46px; height: 46px; min-width: 46px; min-height: 46px; padding: 0;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: #fff; border: 1.5px solid #e2c9a6; color: var(--tia-vino);
+}
+.tia-composer .cz-dict__btn--icono svg { width: 22px; height: 22px; display: block; }
+.tia-composer .cz-dict__btn--icono.is-escuchando {
+  background: #c1121f; border-color: #c1121f; color: #fff;
+  animation: tiaLatido 1.2s infinite ease-in-out;
+}
+.tia-composer .cz-dict__btn {
+  min-height: 42px; border-radius: 999px; border: 1px solid var(--tia-borde); background: #fff;
+  padding: 8px 11px; font-size: 14px; font-weight: 600; color: var(--tia-vino); cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.tia-composer .cz-dict__aviso { position: absolute; left: 10px; right: 10px; bottom: 100%; }
+.cz-dict__btn.is-escuchando { background: #c1121f; border-color: #c1121f; color: #fff; }
+.cz-dict__aviso {
+  display: none; flex: 1 1 100%; border-radius: 10px; padding: 8px 11px; font-size: 13px;
+  border-left: 3px solid var(--tia-borde); background: #fff8ec; color: var(--tia-gris);
+}
+.cz-dict__aviso--visible { display: block; }
+.cz-dict__aviso--ok { border-left-color: #15803d; background: #ecfdf3; color: #15803d; }
+.cz-dict__aviso--error { border-left-color: #dc2626; background: #fef2f2; color: #b91c1c; }
+
+/* ------------------------------------------------------------------ pantallas grandes */
+@media (min-width: 700px) {
+  .tia-chat { padding: 18px 20px 10px; }
+  .tia-opciones { padding: 12px 20px 6px; }
+  .tia-composer { padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); }
+  .tia-resumen__fotos { grid-template-columns: repeat(4, 1fr); }
+  .tia-top__quien { padding-left: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tia-tip span { animation: none; }
+  .tia-btn:active, .tia-chip:active { transform: none; }
+  .tia-chat { scroll-behavior: auto; }
+}
+
+/* =====================================================================================
+ * 🎯 EL COMPOSITOR IDÉNTICO AL DE WHATSAPP (2026-09-15/16)
+ * =====================================================================================
+ * Dos órdenes del jefe:
+ *   1.ª (2026-09-15, noche): *«quiero que copies exactamente el menú de WhatsApp de la parte de abajo
+ *       donde se dedica a enviar mensajes, cópialos igual, muy igual»*.
+ *   2.ª (2026-09-16, con su captura en la mano): *«en modo mobile el área de mensajes y los botones…
+ *       hazlos idénticos al WhatsApp, HASTA EN COLOR, sobre todo en modo mobile, IDÉNTICO»*.
+ *
+ * 📱 CÓMO ES EL DE VERDAD (WhatsApp Android, que es el de su captura), de izquierda a derecha:
+ *      [😊]  [ Mensaje…………………… ]  [📎]  [📷]  [🎤]
+ *      · la franja de abajo es del MISMO color del fondo del chat (el papel tapiz), sin caja propia;
+ *      · arriba de ella flota UNA PASTILLA BLANCA con esquinas muy redondeadas;
+ *      · los tres íconos son GRISES (#54656f) y sin fondo;
+ *      · el botón de la derecha es un CÍRCULO VERDE de WhatsApp (#00a884) con el ícono BLANCO:
+ *        micrófono si no hay texto, flecha de enviar en cuanto lo hay.
+ * ⚠️ Aquí NO va el micrófono negro que se pidió antes: manda la última orden (idéntico, hasta el color).
+ * ⛔ 2026-09-20: estas dos reglas (`.tia-composer` y `.tia-composer__caja` con la franja transparente y
+ *    la pastilla blanca) **se borraron**: El maestro dejó de usar el compositor verde y sus dos reglas
+ *    pisaban las de la guía (que van abajo). Lo que sigue de aquí para abajo es SOLO de 👑 El Supremo.
+ * ===================================================================================== */
+/* ══════════════════════════════════════════════════════════════════════════════════════════════════
+   ⚠️ EL COMPOSITOR VERDE DE WHATSAPP: **LO SIGUE USANDO 👑 EL SUPREMO** (no borrarlo)
+   ──────────────────────────────────────────────────────────────────────────────────────────────────
+   El 2026-09-20 El maestro dejó de usar estas clases (su compositor pasó a ser el de la guía, abajo),
+   pero **`supremo.php` (la venta en vivo) reusa la MISMA estructura** (`#supEmoji`, `#supClip`,
+   `#supCam`, `#supEnviar`, `#supEmojiPanel`) y `supremo.js` busca `.tia-wa__mic-ico` /
+   `.tia-wa__mic-enviar`. Si se quitan estas reglas, **El Supremo se queda sin estilos** (el campo y sus
+   botones salen pelados). Por eso se quedan aquí, compartidas.
+   ⚠️ TRAMPA PISADA: al reemplazar el compositor de El maestro hay que mirar QUIÉN MÁS usa sus clases
+   (`grep` de `tia-wa` en todo `deploy/`), no solo el archivo que se está tocando.
+   ══════════════════════════════════════════════════════════════════════════════════════════════════ */
+.tia-wa {
+  display: flex; align-items: flex-end; gap: 2px;
+  background: #fff; border: 0; border-radius: 26px;
+  padding: 5px 6px;
+  min-height: 52px;
+  box-shadow: 0 1px 1px rgba(11, 20, 26, .13);
+}
+.tia-wa__campo {
+  flex: 1 1 auto; min-width: 0;
+  border: 0; background: transparent; resize: none;
+  font-size: 16px; font-family: inherit; line-height: 1.4; color: #111b21;
+  padding: 11px 4px; max-height: 110px; display: block;
+}
+.tia-wa__campo:focus { outline: none; }
+.tia-wa__campo::placeholder { color: #8696a0; }
+/* Los tres íconos: grises, sin fondo, del tamaño del dedo (44 px es lo que pide el móvil). */
+.tia-wa__icos { display: flex; align-items: center; gap: 0; flex: 0 0 auto; }
+.tia-wa__ico {
+  width: 42px; height: 42px; display: grid; place-items: center;
+  border: 0; background: transparent; color: #54656f; border-radius: 50%; cursor: pointer;
+  padding: 0;
+}
+.tia-wa__ico svg { width: 24px; height: 24px; }
+.tia-wa__ico:active { background: rgba(11, 20, 26, .08); }
+/* El botón redondo: el VERDE de WhatsApp, con el ícono blanco (micrófono ➜ enviar). */
+.tia-wa__mic {
+  width: 48px; height: 48px; flex: 0 0 48px; border: 0; border-radius: 50%;
+  background: #00a884; color: #fff; display: grid; place-items: center; cursor: pointer; padding: 0;
+}
+.tia-wa__mic svg { width: 24px; height: 24px; }
+.tia-wa__mic.is-dictando { background: #e53935; animation: tiaLatido 1.1s infinite ease-in-out; }
+.tia-wa__mic span { display: contents; }
+.tia-wa__mic[disabled] { opacity: .6; }
+/* 😊 El cajón de emojis (WhatsApp lo abre en una hoja blanca; aquí, debajo de la barra). */
+.tia-emoji {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px;
+  padding: 8px 10px; margin-top: 6px;
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 1px 1px rgba(11, 20, 26, .13);
+  max-height: 34vh; overflow-y: auto;
+}
+.tia-emoji button { font-size: 23px; line-height: 1; background: transparent; border: 0; padding: 6px 0; cursor: pointer; border-radius: 8px; }
+.tia-emoji button:active { background: rgba(11, 20, 26, .08); }
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════════════
+   🎯 EL COMPOSITOR DE LA GUÍA, TAL CUAL (orden del jefe, 2026-09-20): 📷 · 🎤 · cuadro · ➤
+   ──────────────────────────────────────────────────────────────────────────────────────────────────
+   Textual: *«quiero llevar este mismo estilo de los botones —el botón de cámara, el botón de grabador,
+   el input y el botón de enviar— a la página del maestro, tal cual como lo tenemos ahorita, tal cual»*.
+   · El 📷 y el ➤ son los **círculos gris claro** de la guía; el 🎤 es el **círculo NARANJA del
+     buscador** (mismos valores: `--marca-naranja`, SVG de 22 px y el latido rojo `#c1121f` mientras
+     escucha); el cuadro es la **píldora delgada** gris con el anillo naranja al enfocarla.
+   · ⛔ Se fueron el compositor verde de WhatsApp (😊 📎 🎤 verde), los dos botones grandes de foto y la
+     ventana modal de la cámara: ahora la cámara tiene su **menú chiquito encima del botón**.
+   · 🔴 **LA TRAMPA QUE HABÍA QUE ARREGLAR (2026-09-20, la que vio el jefe):** la fila del compositor
+     llevaba la clase **`.tia-barra`**, que es **la MISMA de la barrita del progreso de la cabecera**
+     (`.tia-barra` → `height: 4px; background: rgba(255,255,255,.18)`). Al fusionarse las dos reglas, la
+     fila quedaba de **12 px de alto y blanca** (los botones se salían por arriba y por abajo, pisando el
+     botón «Ubicación» de al lado) y **la barrita del progreso** se volvía una **píldora blanca** en la
+     cabecera. Por eso la fila del compositor se llama **`.tia-composer__linea`** y su clase NO se
+     comparte con nada. Regla de oro: **una clase, un uso** (y `grep` de la clase nueva antes de usarla).
+   ══════════════════════════════════════════════════════════════════════════════════════════════════ */
+.tia-composer__linea {
+  display: flex; align-items: center; gap: 6px;
+  background: transparent; border: 0; border-radius: 0;
+  padding: 0; box-shadow: none;
+}
+/* ✍️ EL CUADRO DE ESCRIBIR: la MISMA píldora delgada de la guía (`.cbot-input`): 34 px, gris suave, sin
+   borde a la vista, y blanca con el anillo naranja al enfocarla. La letra se queda en 16 px (regla del
+   sitio: en el celular por debajo de 16 px el iPhone hace zoom solo). Crece sola hasta 110 px. */
+.tia-campo {
+  flex: 1 1 auto; min-width: 0;
+  border: 1px solid transparent; border-radius: 999px;
+  background: #f1f2f4; resize: none;
+  font-size: 16px; font-family: inherit; line-height: 20px; color: #111b21;
+  padding: 6px 13px; max-height: 110px; display: block; height: 34px;
+}
+.tia-campo:focus { outline: none; background: #fff; border-color: var(--marca-naranja, #ea6a12); box-shadow: 0 0 0 2px rgba(224, 122, 31, .16); }
+.tia-campo::placeholder { color: #8b8f96; }
+/* 📷 La cámara y ➤ el enviar: los mismos círculos de la guía. */
+.tia-cam, .tia-enviar {
+  flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; border: 0;
+  display: grid; place-items: center; cursor: pointer; padding: 0;
+}
+.tia-cam { background: #f0f2f5; color: #111b21; }
+.tia-cam:hover { background: #e4e6eb; }
+/* ➤ El naranja del sitio tal cual (`base.css`: `--marca-naranja: #ea6a12`). El maestro es una página
+   sola y no carga `base.css`, así que sin este valor de respaldo el ➤ salía de OTRO naranja (#e07a1f)
+   y no era el mismo de la guía. */
+.tia-enviar { background: var(--marca-naranja, #ea6a12); color: #fff; }
+.tia-enviar:hover { background: var(--marca-naranja-osc, #c8550a); }
+.tia-cam svg, .tia-enviar svg { width: 21px; height: 21px; display: block; fill: currentColor; }
+.tia-cam[disabled], .tia-enviar[disabled], .tia-voz[disabled] { opacity: .5; cursor: default; }
+/* 🎤 EL MICRÓFONO: idéntico al del buscador (naranja, 42 px, con su latido rojo al escuchar). */
+.tia-voz {
+  flex: 0 0 auto; width: 42px; height: 42px; min-width: 42px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--marca-naranja, #ea6a12); color: #fff; line-height: 1; cursor: pointer;
+  display: grid; place-items: center;
+}
+.tia-voz:hover { background: var(--marca-naranja-osc, #c8550a); }
+.tia-voz:active { transform: scale(.92); }
+.tia-voz svg { display: block; width: 22px; height: 22px; }
+.tia-voz__icono { display: block; pointer-events: none; }
+.tia-voz.is-escuchando { background: #c1121f; animation: tiaVozLatido 1.1s ease-in-out infinite; }
+@keyframes tiaVozLatido {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(193, 18, 31, .65); }
+  50%      { box-shadow: 0 0 0 7px rgba(193, 18, 31, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .tia-voz.is-escuchando { animation: none; } }
+.tia-voz[hidden] { display: none; }
+.tia-campo.voz-escuchando::placeholder { color: #dc2626; font-weight: 700; }
+/* 📷 EL MENÚ CHIQUITO DE LA CÁMARA: sale ENCIMA del botón (como el ☰ del sitio). Se ancla a
+   `.tia-composer`, que es el que tiene `position: relative` (los mismos 8 px de la guía). */
+.tia-cam-menu {
+  position: absolute; left: 8px; bottom: calc(100% + 4px); z-index: 30;
+  min-width: 150px; max-width: 70%;
+  background: #fff; border: 1px solid #e8ddd0; border-radius: 12px; padding: 5px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tia-cam-menu[hidden] { display: none; }
+.tia-cam-op {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  background: transparent; border: 0; border-radius: 9px; padding: 8px 10px;
+  font-size: 13px; font-weight: 700; color: #2b2118; cursor: pointer; font-family: inherit; text-align: left;
+}
+.tia-cam-op:hover { background: #f6f6f7; }
+.tia-cam-op span { font-size: 15px; line-height: 1; }
+/* 🔔 EL AVISO DEL MICRÓFONO: la misma caja blanca del buscador. */
+.tia-voz-aviso {
+  position: absolute; left: 8px; right: 8px; bottom: calc(100% + 4px); z-index: 29;
+  display: none; text-align: left;
+  background: #fff; color: #2b2118; border-left: 4px solid var(--marca-naranja, #ea6a12);
+  border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+  padding: 10px 12px; font-size: 14px; line-height: 1.35;
+}
+.tia-voz-aviso--visible { display: block; }
+.tia-voz-aviso--error { border-left-color: #dc2626; }
+.tia-ayuda { color: #6b7a82; }
+
+
+/* 🗺️ Las tarjetas de distrito: grilla 2×2 con su miniatura (el jefe las pidió así) */
+.tia-opciones--rejilla { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+.tia-dist {
+  display: flex; align-items: center; gap: 9px;
+  border: 1.5px solid #e2c9a6; background: #fff; border-radius: 14px;
+  padding: 8px 9px; cursor: pointer; text-align: left;
+  font-family: inherit; font-size: 15.5px; font-weight: 700; color: #2b2118;
+}
+.tia-dist__mini {
+  width: 46px; height: 46px; flex: 0 0 46px; border-radius: 11px;
+  display: grid; place-items: center; color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+}
+.tia-dist__mini svg { width: 24px; height: 24px; }
+.tia-dist.is-ok { border-color: #15803d; box-shadow: inset 0 0 0 2px rgba(21,128,61,.18); }
+.tia-dist.is-ok::after { content: '✅'; margin-left: auto; font-size: 15px; }
+/* 🔵 El botón de «Todos los distritos» (el jefe lo pidió abajo y en azul) */
+.tia-chip--azul {
+  background: linear-gradient(180deg, #17518f, #123c6b); border-color: #123c6b; color: #fff;
+  width: 100%; justify-content: center; font-size: 16px; padding: 14px 18px;
+}
+
+/* =====================================================================================
+ * 🪟 LAS VENTANAS EMERGENTES (2026-09-16)
+ * =====================================================================================
+ * Orden del jefe: *«pon submenús en popup escondidos, ejemplo al abrir la cámara puede ser un modal que
+ * carga las 2 opciones y asimismo mete otros modales donde lo creas conveniente»*.
+ *
+ * Son las tres hojas que nacen **escondidas** (`hidden`, y aquí el `[hidden] { display:none !important }`
+ * de arriba manda) y que abre `tienda_ia.js`:
+ *   · 📷 `#tiaSheetFoto`    → las DOS formas de mandar una foto (cámara o galería).
+ *   · 🏪 `#tiaSheetTiendas` → todas sus tiendas (un mismo usuario puede tener varios negocios).
+ *   · 🆕 `#tiaSheetOtra`    → la confirmación de «crear otra tienda».
+ * Se pintan pegadas abajo (como las hojas de WhatsApp) y en pantalla grande quedan centradas.
+ * ===================================================================================== */
+.tia-sheet {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.tia-sheet__velo { position: absolute; inset: 0; background: rgba(11, 20, 26, .45); }
+.tia-sheet__caja {
+  position: relative;
+  /* 📱 El ancho se descuenta a mano (`100% - 16px`) y no con márgenes: con `width:100%` + márgenes la
+     caja se salía 16 px del celular y el borde derecho quedaba cortado. */
+  width: calc(100% - 16px); max-width: 460px;
+  margin: 0 0 calc(10px + env(safe-area-inset-bottom));
+  background: #fff; border-radius: 20px;
+  padding: 14px 12px 10px;
+  box-shadow: 0 20px 50px rgba(11, 20, 26, .32);
+  max-height: 88vh; overflow-y: auto;
+  animation: tiaSube .18s ease-out;
+}
+@keyframes tiaSube { from { transform: translateY(16px); opacity: .55; } to { transform: none; opacity: 1; } }
+.tia-sheet__tit { margin: 2px 4px 10px; font-size: 17px; font-weight: 800; color: var(--tia-vino); }
+.tia-sheet__nota { margin: 0 4px 12px; font-size: 15px; line-height: 1.45; color: #3f3a33; }
+.tia-sheet__op {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  text-align: left; background: var(--tia-crema);
+  border: 1px solid var(--tia-borde); border-radius: 16px;
+  padding: 12px 14px; margin-bottom: 8px;
+  font: inherit; color: #2b2118; cursor: pointer;
+}
+.tia-sheet__op:active { transform: scale(.99); }
+.tia-sheet__op--nuevo {
+  background: linear-gradient(180deg, #f07a22, #ea6a12);
+  border-color: #ea6a12; color: #fff;
+}
+.tia-sheet__op--nuevo .tia-sheet__txt small { color: #ffe6d3; }
+.tia-sheet__ico { flex: 0 0 30px; width: 30px; text-align: center; font-size: 24px; }
+.tia-sheet__txt { display: flex; flex-direction: column; min-width: 0; }
+.tia-sheet__txt strong { font-size: 16px; }
+.tia-sheet__txt small { font-size: 13px; font-weight: 500; color: var(--tia-gris); }
+.tia-sheet__cerrar {
+  display: block; width: 100%;
+  background: transparent; border: 0; border-radius: 12px;
+  color: var(--tia-gris); font: inherit; font-size: 15.5px; font-weight: 600;
+  padding: 10px; cursor: pointer;
+}
+.tia-sheet__cerrar:active { background: #f1efec; }
+.tia-sheet__lista { margin: 0 0 10px; max-height: 46vh; overflow-y: auto; }
+.tia-sheet__vacio { margin: 4px; font-size: 15px; line-height: 1.45; color: var(--tia-gris); }
+/* 🏪 Cada tienda suya, con sus dos puertas: ver su ficha y cargarle productos */
+.tia-tienda {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px; margin-bottom: 7px;
+  border: 1px solid var(--tia-borde); border-radius: 14px;
+  background: #fffdf9; color: #2b2118;
+}
+.tia-tienda__ico { font-size: 22px; flex: 0 0 auto; }
+.tia-tienda__txt { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.tia-tienda__txt strong { font-size: 15.5px; line-height: 1.2; }
+.tia-tienda__txt small { font-size: 13px; color: var(--tia-gris); }
+.tia-tienda__acc { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+.tia-tienda__ver {
+  color: var(--tia-vino); font-weight: 700; font-size: 15px; text-decoration: none;
+  padding: 6px 4px;
+}
+.tia-tienda__mas {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: #fff5e9; border: 1px solid #f0c9a0; color: #8a3b00;
+  border-radius: 999px; padding: 7px 11px;
+  font-size: 13.5px; font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.tia-tienda__mas:active { transform: scale(.97); }
+.tia-tienda__mas small { font-size: 13.5px; }
+/* 📱 En un celular angosto los dos botones bajan a su propia línea: así el nombre de la tienda
+   nunca los empuja fuera de la pantalla. */
+@media (max-width: 430px) {
+  .tia-tienda { flex-wrap: wrap; }
+  .tia-tienda__acc { flex: 1 1 100%; justify-content: flex-end; margin-top: 2px; }
+}
+/* El chat no se mueve mientras hay una ventana abierta */
+body.tia-con-sheet { overflow: hidden; }
+@media (min-width: 800px) {
+  .tia-sheet { align-items: center; }
+  .tia-sheet__caja { margin: 0; }
+}

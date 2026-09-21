@@ -1,0 +1,17 @@
+# 🎵 LA CARPETA DEL FFMPEG DE LAS CANCIONES (2026-09-17) — NO SE SIRVE POR WEB
+# ==========================================================================
+# Aquí vive el **ffmpeg estático** (76 MB) que recorta los jingles de las tiendas a 40,000 s exactos.
+# El motor lo EJECUTA desde el disco (`shell_exec` en `includes/cancion.php`): nadie tiene que
+# descargarlo. Sin esta regla, cualquiera podría bajarse 76 MB desde la web (tráfico regalado y sin
+# ninguna razón). Se subió con `python __cancion_subir_ffmpeg.py go`.
+#
+# ⚠️ Si algún día se vuelve a subir el binario, esta regla NO estorba: el bloqueo es solo para el
+#    navegador; PHP sigue pudiendo ejecutarlo.
+
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

@@ -1,0 +1,308 @@
+/* ============================================================
+   Módulo de publicidad — banners y modal de negocios
+   Regla responsive: PC hasta 3 banners por fila · MÓVIL: los banners de la fila se apilan
+   uno debajo de otro (pedido del jefe 2026-09-10: antes en móvil se ocultaban el 2.º y el 3.º
+   y él quiere verlos todos, apilados).
+   Fila apilada a propósito: añadir la clase `banners-fila--uno`.
+   ============================================================ */
+
+/* --- Fila de banners --- */
+.banners-fila {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 14px 0;
+}
+/* Versión compacta (portada): menos aire arriba y abajo para que la página quede más junta */
+.banners-fila--compacta { margin: 8px 0; }
+@media (min-width: 769px) {
+    .banners-fila              { grid-template-columns: repeat(3, 1fr); }
+    .banners-fila--uno         { grid-template-columns: 1fr; }
+    .banners-fila--dos         { grid-template-columns: repeat(2, 1fr); }
+    .banners-fila--tres        { grid-template-columns: repeat(3, 1fr); }
+}
+/* ⚠️ Aquí estaba la regla que OCULTABA el 2.º y 3.er banner en móvil:
+      @media (max-width: 768px) { .banners-fila > .banner-anuncio:nth-child(n+2) { display: none; } }
+   El jefe pidió verlos todos apilados, así que se quitó (2026-09-10). Si algún día se quiere
+   volver a mostrar solo el primero en móvil, esa es la regla que hay que reponer. */
+
+.banner-anuncio {
+    display: block;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+    background: #fff;
+    text-decoration: none;
+    transition: transform .15s ease, box-shadow .15s ease;
+    cursor: pointer;
+}
+.banner-anuncio:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .16);
+}
+.banner-anuncio img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 0;
+}
+
+/* --- Modal "¿qué necesitas? -> negocios" --- */
+.bn-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+}
+.bn-modal[hidden] { display: none; }
+.bn-modal__fondo {
+    position: absolute;
+    inset: 0;
+    background: rgba(23, 10, 4, .62);
+    backdrop-filter: blur(2px);
+}
+.bn-modal__caja {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    max-height: min(88vh, 820px);
+    display: flex;
+    flex-direction: column;
+    background: #fdfaf3;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+    animation: bn-pop .18s ease;
+}
+@keyframes bn-pop { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.bn-modal__head {
+    background: linear-gradient(135deg, #6d071a, #4a0512);
+    color: #fff;
+    padding: 14px 16px 12px;
+    position: relative;
+}
+/* La ✕: estaba posicionada (absolute) igual que el encabezado, y como el encabezado
+   viene DESPUÉS en el HTML y los dos tenían z-index auto, el encabezado guinda se
+   pintaba ENCIMA: la ✕ era invisible y el clic lo recibía el encabezado (el modal no
+   cerraba). Se comprobó en vivo con document.elementsFromPoint → devolvía el
+   encabezado. Por eso lleva z-index propio. Sesión 2026-09-10. */
+.bn-modal__cerrar {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    z-index: 3;
+    border: 1.5px solid rgba(255, 255, 255, .6);
+    background: rgba(0, 0, 0, .25);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+.bn-modal__cerrar:hover { background: rgba(255, 255, 255, .3); }
+
+.bn-modal__titulo {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0 46px 2px 0;   /* deja libre la ✕ de 36 px */
+    line-height: 1.3;
+}
+.bn-modal__sub { font-size: 12.5px; opacity: .85; margin: 0 46px 0 0; }
+
+/* Selector de zona (distrito o "📍 Cerca de mí") */
+.bn-modal__filtro {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #fff;
+    border-bottom: 1px solid #e8e0d2;
+}
+.bn-modal__filtro label { font-size: 12.5px; font-weight: 700; color: #7a5230; white-space: nowrap; }
+.bn-modal__select {
+    flex: 1;
+    font: inherit;
+    font-size: 16px;   /* ≥16 px: en el celular el navegador no hace zoom al abrirlo */
+    padding: 8px 10px;
+    border: 1.5px solid #d9cfc0;
+    border-radius: 10px;
+    background: #fffdf8;
+    color: #171717;
+    cursor: pointer;
+}
+.bn-modal__select:focus { outline: none; border-color: #6d071a; }
+
+/* Cuerpo: mensajes + lista */
+.bn-modal__cuerpo { overflow-y: auto; padding: 12px 16px 14px; flex: 1; }
+.bn-modal__msg { font-size: 13.5px; color: #5b4a35; margin: 4px 0 10px; line-height: 1.5; }
+.bn-modal__vacio { text-align: center; color: #8a7a63; padding: 26px 8px; font-size: 14px; line-height: 1.6; }
+
+.bn-lista { display: grid; gap: 10px; }
+.bn-item {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ece5d8;
+    border-radius: 14px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.bn-item:hover { border-color: #d9cfc0; box-shadow: 0 6px 18px rgba(0, 0, 0, .10); }
+/* TODA la celda es clicable: capa transparente que cubre la celda completa (foto,
+   textos y zona blanca) y abre la tienda. Los botones de .bn-item__acciones van
+   por encima con z-index: 2 para seguir funcionando por separado. */
+.bn-item__link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+}
+.bn-item__img {
+    width: 62px;
+    height: 62px;
+    flex: 0 0 62px;
+    object-fit: cover;
+    border-radius: 12px;
+    background: #f1e9da;
+}
+.bn-item__info { flex: 1; min-width: 0; }
+.bn-item__nombre {
+    font-weight: 800;
+    font-size: 14.5px;
+    color: #171717;
+    text-decoration: none;
+    display: block;
+    line-height: 1.25;
+}
+.bn-item__nombre:hover,
+.bn-item:hover .bn-item__nombre { color: #6d071a; }
+.bn-item__meta { font-size: 12px; color: #8a7a63; margin-top: 2px; line-height: 1.4; }
+.bn-item__acciones { position: relative; z-index: 2; display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.bn-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+}
+.bn-btn--ver { background: #6d071a; color: #fff; }
+.bn-btn--ver:hover { background: #4a0512; }
+.bn-btn--wa { background: #25d366; color: #fff; }
+.bn-btn--tel { background: #123c6b; color: #fff; }
+.bn-modal__pie {
+    padding: 8px 16px 12px;
+    text-align: center;
+    font-size: 11.5px;
+    color: #9a8a72;
+    border-top: 1px dashed #e0d6c4;
+}
+
+/* Carga */
+.bn-spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(109, 7, 26, .25);
+    border-top-color: #6d071a;
+    border-radius: 50%;
+    animation: bn-gira .7s linear infinite;
+    vertical-align: -3px;
+    margin-right: 6px;
+}
+@keyframes bn-gira { to { transform: rotate(360deg); } }
+
+/* ===== 🧭 CERCA DE MÍ: botón del medio, barrita de estado y distancia =====
+   (2026-09-10, pedido del jefe Jimmy). El botón va DESPUÉS del 3.er resultado y
+   ordena por cercanía LO MISMO que ya se está mostrando: no cambia el criterio
+   del banner, solo el orden. Se pinta como "plus" (crema punteado) para que no
+   se confunda con los botones de la tienda (WhatsApp / Llamar / Ver tienda). */
+.bn-cerca-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 12px 0;
+    background: #fff7ed;
+    border: 1.5px dashed #f97316;
+    color: #9a3412;
+    border-radius: 14px;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+}
+.bn-cerca-btn:hover { background: #ffedd5; }
+.bn-cerca-btn:active { transform: scale(.99); }
+.bn-cerca-btn.is-busy { opacity: .65; pointer-events: none; }
+.bn-cerca-btn__t { font-size: 15.5px; font-weight: 800; line-height: 1.2; }
+.bn-cerca-btn__s { font-size: 12.5px; font-weight: 500; opacity: .9; }
+
+/* Barrita cuando la cercanía YA está activa (reemplaza al botón del medio). */
+.bn-cerca-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 8px 10px;
+    margin: 2px 0 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #14532d;
+}
+.bn-volver {
+    background: #fff;
+    border: 1px solid #14532d;
+    color: #14532d;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.bn-volver:hover { background: #14532d; color: #fff; }
+
+/* Distancia en cada resultado (solo cuando está activo "cerca de mí"). */
+.bn-item__dist {
+    display: inline-block;
+    margin-top: 4px;
+    background: #ecfdf5;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 11.5px;
+    font-weight: 800;
+}
+
+/* Avisos cortos dentro del modal (ubicación negada, negocios sin mapa). */
+.bn-modal__msg--aviso {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    border-radius: 10px;
+    padding: 8px 10px;
+}
+.bn-nota { font-size: 11.5px; color: #9a8a72; margin: 10px 0 0; text-align: center; line-height: 1.5; }

@@ -1,0 +1,196 @@
+/* ============================================================
+   PLANTILLA B — GALERÍA ARRIBA (sin auto-rotación)
+   ============================================================ */
+body[data-plantilla="B"] .ficha-B { display: block; }
+.ficha-B { display: none; }
+
+.ficha-B__hero {
+    position: relative; aspect-ratio: 4 / 5;
+    border-radius: var(--radio-borde); overflow: hidden;
+    background: #1f2937; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+/* Ficha SIN fotos (p. ej. cuando se retiró una captura de pantalla por seguridad):
+   el hero se achica para que NO quede un bloque vacío, y el nombre sigue viéndose abajo. */
+.ficha-B__hero--sin-fotos { aspect-ratio: auto; min-height: 118px; background: var(--color-principal, #1f2937); }
+
+.ficha-B__hero-slide {
+    position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease;
+}
+.ficha-B__hero-slide.activo { opacity: 1; }
+.ficha-B__hero-slide img { width: 100%; height: 100%; object-fit: cover; }
+
+.ficha-B__hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* 🔁 2026-09-14: este bloque va ENCIMA del carrusel de fotos (abajo, con el nombre y las
+   etiquetas) y se comía el toque: la mitad de abajo de la foto no se podía abrir en la
+   galería. Dentro solo hay texto, ningún enlace, así que se deja «transparente al dedo».
+   ⚠️ Si algún día se pone un botón o un enlace aquí dentro, hay que sacarle este
+   `pointer-events: none` o no se podrá tocar. */
+.ficha-B__hero-info {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 20px 16px; color: #fff;
+    pointer-events: none;
+}
+
+.ficha-B__hero-info h1 {
+    font-size: 24px; font-weight: 700; margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.ficha-B__hero-meta {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px;
+}
+
+.ficha-B__hero-meta .badge { background: var(--color-acento); color: #fff; }
+.ficha-B__hero-meta .rating { color: #fff; }
+.ficha-B__hero-meta .estrellas { color: #fbbf24; letter-spacing: 2px; }
+
+/* Navegación manual: flechas + dots clickeables */
+.ficha-B__hero-nav {
+    position: absolute; top: 50%; left: 0; right: 0;
+    transform: translateY(-50%);
+    display: flex; justify-content: space-between;
+    padding: 0 8px; pointer-events: none;
+}
+
+.ficha-B__hero-nav-btn {
+    pointer-events: auto;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,0.45); color: #fff;
+    font-size: 22px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px); user-select: none;
+}
+.ficha-B__hero-nav-btn:active { background: rgba(0,0,0,0.7); transform: scale(0.92); }
+
+.ficha-B__hero-dots {
+    position: absolute; top: 12px; right: 12px;
+    display: flex; gap: 4px;
+}
+
+.ficha-B__hero-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s;
+}
+.ficha-B__hero-dot.activo { background: var(--color-acento); width: 20px; border-radius: 3px; }
+
+.ficha-B__datos {
+    background: var(--color-fondo-tarjeta);
+    border-radius: var(--radio-borde); padding: 12px;
+    margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+    border-top: 3px solid var(--color-acento);
+}
+
+.ficha-B__datos-fila {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+}
+
+.ficha-B__dato-mini {
+    padding: 8px; background: var(--color-fondo-app); border-radius: 8px; text-align: center;
+}
+
+.ficha-B__dato-mini-icono { font-size: 18px; margin-bottom: 4px; color: var(--color-primario); }
+
+.ficha-B__dato-mini-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--color-texto-claro); margin-bottom: 2px;
+}
+
+.ficha-B__dato-mini-valor { font-size: 13px; font-weight: 600; }
+
+.ficha-B__acciones-principales {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;
+}
+
+.ficha-B__descripcion {
+    background: var(--color-fondo-tarjeta); border-radius: var(--radio-borde);
+    padding: 16px; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+.ficha-B__descripcion-toggle {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--color-primario);
+    cursor: pointer; margin-bottom: 8px;
+}
+.ficha-B__descripcion-toggle::after { content: "▼"; font-size: 10px; color: var(--color-acento); }
+
+.ficha-B__descripcion-contenido {
+    font-size: 14px; line-height: 1.6; white-space: pre-line;
+    max-height: 100px; overflow: hidden; position: relative;
+}
+.ficha-B__descripcion-contenido::after {
+    content: ""; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 30px;
+    background: linear-gradient(to bottom, transparent, var(--color-fondo-tarjeta));
+}
+.ficha-B__descripcion.expandida .ficha-B__descripcion-contenido { max-height: none; }
+.ficha-B__descripcion.expandida .ficha-B__descripcion-contenido::after { display: none; }
+
+.ficha-B__productos {
+    background: var(--color-fondo-tarjeta); border-radius: var(--radio-borde);
+    padding: 16px; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+.ficha-B__productos-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+}
+
+.ficha-B__productos-header h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--color-primario);
+}
+
+.ficha-B__productos-contador {
+    background: var(--color-acento); color: #fff;
+    font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600;
+}
+
+.ficha-B__productos-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+
+.ficha-B__producto-card {
+    background: var(--color-fondo-app); border-radius: 10px; overflow: hidden;
+}
+
+.ficha-B__producto-card-img {
+    aspect-ratio: 1; background: #f3f4f6; position: relative; overflow: hidden;
+}
+
+.ficha-B__producto-card-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.ficha-B__producto-card-precio-overlay {
+    position: absolute; bottom: 6px; left: 6px;
+    background: rgba(0,0,0,0.85); color: #fff;
+    padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
+}
+
+.ficha-B__producto-card-body { padding: 8px 10px; }
+
+.ficha-B__producto-card-body h3 {
+    font-size: 12px; font-weight: 600; line-height: 1.3; margin-bottom: 4px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; min-height: 32px;
+}
+
+.ficha-B__producto-card-unidad {
+    font-size: 10px; color: var(--color-texto-claro); text-transform: uppercase;
+}
+
+.ficha-B__mapa {
+    background: var(--color-fondo-tarjeta); border-radius: var(--radio-borde);
+    overflow: hidden; margin-bottom: 16px; box-shadow: var(--sombra-tarjeta);
+}
+
+.ficha-B__mapa iframe { width: 100%; height: 180px; border: 0; display: block; }
+
+.ficha-B__mapa-info {
+    padding: 10px 12px; font-size: 13px; color: var(--color-texto);
+}
+.ficha-B__mapa-info strong { color: var(--color-primario); }

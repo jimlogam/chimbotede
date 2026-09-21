@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# 🔒 LAS PUERTAS DE ADENTRO NO SE RASTREAN (2026-09-16)
+# El panel, los editores y las puertas internas no son contenido para nadie: si Google los
+# rastrea, gasta en eso el tiempo que debería usar en las tiendas y los productos. Todas están
+# detrás de una sesión, así que bloquearlas no le quita nada a ningún visitante.
+Disallow: /panel.php
+Disallow: /superadmin.php
+Disallow: /editatiendas.php
+Disallow: /editaproductos.php
+Disallow: /crear_tienda_ia.php
+Disallow: /login.php
+Disallow: /registro.php
+Disallow: /api/
+Disallow: /cron/
+
+# 🔍 El buscador CON FILTROS no se rastrea (se duplica solo con cada combinación de filtros y
+# cada una sería una página casi igual). El buscador LIMPIO (/buscar.php, sin nada detrás) sí
+# está permitido y va en el sitemap.
+Disallow: /buscar.php?
+
+Sitemap: https://dechimbote.com/sitemap.xml

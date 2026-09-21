@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba de diseño banners</title>
+<!-- PRUEBA-DISENO-v1: pagina temporal para verificar que los archivos nuevos SI se sirven -->
+<link rel="stylesheet" href="/assets/css/banners.css?v=1">
+<link rel="stylesheet" href="/assets/css/banners-v2.css?v=1">
+<style>
+  body{font-family:Arial;background:#f7efe2;padding:20px}
+  h1{color:#6d071a}
+  .nota{background:#fff;border:1px solid #ccc;padding:10px;border-radius:8px;margin:10px 0}
+</style>
+</head>
+<body>
+  <h1>Página de prueba — diseño de banners</h1>
+  <div class="nota">Si ves esta página con texto normal, los archivos NUEVOS subidos por FTP SÍ se están sirviendo en dechimbote.com.</div>
+  <div class="nota">Abajo se muestran 3 cajas que DEBEN verse en UNA SOLA FILA (3 columnas) en escritorio si el CSS nuevo está activo.</div>
+  <div class="banners-fila">
+    <div class="banner-anuncio"><img src="https://dechimbote.com/assets/uploads/banners/banner-01.webp" alt="1"></div>
+    <div class="banner-anuncio"><img src="https://dechimbote.com/assets/uploads/banners/banner-02.webp" alt="2"></div>
+    <div class="banner-anuncio"><img src="https://dechimbote.com/assets/uploads/banners/banner-03.webp" alt="3"></div>
+  </div>
+  <script>document.querySelectorAll('.nota')[1].textContent += ' (CSS carga: ' + (getComputedStyle(document.querySelector('.banners-fila')).gridTemplateColumns) + ')'</script>
+</body>
+</html>

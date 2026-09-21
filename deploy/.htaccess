@@ -1,0 +1,350 @@
+# ============================================
+# Chimbote al Día — .htaccess raíz
+# URLs amigables + seguridad (según guía §12)
+# ============================================
+Options -Indexes
+AddDefaultCharset UTF-8
+
+RewriteEngine On
+
+# 1) Forzar HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://dechimbote.com/$1 [R=301,L]
+
+# 2) www -> sin www (SEO)
+RewriteCond %{HTTP_HOST} ^www\.dechimbote\.com$ [NC]
+RewriteRule ^(.*)$ https://dechimbote.com/$1 [R=301,L]
+
+# 3) URLs amigables (soporta guion bajo, lección del proyecto anterior)
+#    Fichas de negocio ahora en /neg/<slug>
+# Fichas unificadas (mismo establecimiento = una sola URL): ESSALUD Coishco
+RewriteRule ^neg/seguro-social-coishco/?$ /neg/essalud-coishco [R=301,L]
+# Plazas de Santa: "Plaza Mayor De Santa" (id 1032) era la MISMA plaza que "Plaza de Armas de
+# Santa" (id 1569, a ~90 m): se unificaron el 2026-09-10 (fotos y opiniones pasaron a la 1569 y
+# la 1032 quedó inactiva), así que la URL vieja redirige para no dejar un 404 en los enlaces.
+RewriteRule ^neg/plaza-mayor-de-santa/?$ /neg/plaza-de-armas-de-santa [R=301,L]
+RewriteRule ^neg/([a-z0-9_\-]+)/?$ negocio.php?slug=$1 [L,QSA]
+# 🚪 LA MISMA FICHA POR NÚMERO (2026-09-18 — pedido del jefe: «no quiero perder las URLs amigables…
+#    solo quiero tener una puerta trasera para ingresar a ver el sitio»).
+#    · /neg/1875  → ya lo captura la regla de arriba (su patrón admite números): negocio.php ve que el
+#      slug es solo dígitos, busca por id y responde **301 a /neg/<slug>**. Por eso NO hace falta una
+#      regla nueva para /neg/.
+#    · /gen/1875  → es el atajo corto que pidió el jefe (su ejemplo era /gen/1234): esta regla.
+#    En los dos casos la respuesta es un **301 a la dirección amigable**, que sigue siendo la única
+#    oficial (canonical, sitemap.xml y enlaces compartidos no cambian) y Google nunca ve dos
+#    direcciones sirviendo el mismo contenido.
+RewriteRule ^gen/([0-9]+)/?$ negocio.php?id=$1 [L,QSA]
+# 🛒 LA PÁGINA DE UN PRODUCTO (2026-09-15, pedido del jefe: «que el producto se comparta con su
+#    enlace y su foto»). Antes el producto NO tenía dirección propia (su tarjeta abría la ficha
+#    rápida dentro de la tienda) y por eso no se podía compartir. Ahora: /producto/<id>.
+#    El id es SOLO número, así que no choca con ninguna otra ruta del sitio.
+RewriteRule ^producto/([0-9]+)/?$ producto.php?id=$1 [L,QSA]
+# Redirección 301 de las URLs viejas /negocio/... a /neg/... (SEO / no romper enlaces)
+RewriteCond %{THE_REQUEST} \s/+negocio/([a-z0-9_\-]+)
+RewriteRule ^ /neg/%1 [R=301,L]
+# ============================================================================
+# 🏷️ REDIRECCIONES DE LOS RUBROS REORGANIZADOS (2026-09-19, pedido del jefe)
+#    El jefe unificó 124 rubros en ~40 más abiertos: los rubros que se fusionaron y los
+#    que cambiaron de nombre APAGAN su dirección vieja. Estas reglas la llevan a la nueva
+#    (301 = definitivo), así no se rompe ni un enlace repartido ni lo que ya conoce Google.
+#    ⚠️ VAN ANTES de la regla general `^categoria/([a-z0-9_-]+)` (que es la que resuelve
+#       /categoria/<slug> de verdad): si se movieran debajo, no se aplicarían nunca.
+# ============================================================================
+# 🏷️ Rubros que se ELIMINARON sin destino (2026-09-19): su dirección vieja lleva al índice
+#    de rubros (/rubros) en vez de dejar un 404 al visitante (Bomberos, Reciclaje…).
+RewriteRule ^categoria/bomberos-y-emergencias/?$ /rubros [R=301,L]
+RewriteRule ^categoria/reciclaje-y-chatarra/?$ /rubros [R=301,L]
+RewriteRule ^categoria/cevicherias/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/pollerias/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/chifas/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/heladerias-y-juguerias/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/dark_kitchens/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/comida-al-paso-y-ambulante/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/menus-y-bodegones/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/restaurantes-campestres/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/supermercados/?$ /categoria/bodegas [R=301,L]
+RewriteRule ^categoria/tiendas_veganas/?$ /categoria/bodegas [R=301,L]
+RewriteRule ^categoria/pastelerias-y-tortas/?$ /categoria/panaderias [R=301,L]
+RewriteRule ^categoria/panaderias-y-pastelerias/?$ /categoria/panaderias [R=301,L]
+RewriteRule ^categoria/dentistas/?$ /categoria/medicos [R=301,L]
+RewriteRule ^categoria/podologos/?$ /categoria/medicos [R=301,L]
+RewriteRule ^categoria/hospitales-y-postas/?$ /categoria/clinicas [R=301,L]
+RewriteRule ^categoria/masajes-y-terapias/?$ /categoria/terapias [R=301,L]
+RewriteRule ^categoria/centros_de_bienestar_holistico/?$ /categoria/terapias [R=301,L]
+RewriteRule ^categoria/veterinarias_24_horas/?$ /categoria/veterinarias [R=301,L]
+RewriteRule ^categoria/spa_para_mascotas/?$ /categoria/veterinarias [R=301,L]
+RewriteRule ^categoria/barberias/?$ /categoria/peluquerias [R=301,L]
+RewriteRule ^categoria/extensiones-y-pelucas/?$ /categoria/peluquerias [R=301,L]
+RewriteRule ^categoria/maquillaje-profesional/?$ /categoria/belleza [R=301,L]
+RewriteRule ^categoria/perfumerias-y-cosmeticos/?$ /categoria/belleza [R=301,L]
+RewriteRule ^categoria/construccion/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/construccion-y-remodelaciones/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/vidrierias-y-aluminio/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/cerrajeria/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/electricistas/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/ferreterias-y-materiales/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/gasfiteros/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/melamina/?$ /categoria/carpinteros [R=301,L]
+RewriteRule ^categoria/menaje-de-cocina-y-hogar/?$ /categoria/hogar [R=301,L]
+RewriteRule ^categoria/electrodomesticos-y-linea-blanca/?$ /categoria/hogar [R=301,L]
+RewriteRule ^categoria/servicio-tecnico/?$ /categoria/informatica [R=301,L]
+RewriteRule ^categoria/internet-cable-y-telefonia/?$ /categoria/informatica [R=301,L]
+RewriteRule ^categoria/servicios-digitales-streaming/?$ /categoria/informatica [R=301,L]
+RewriteRule ^categoria/venta-de-motos/?$ /categoria/vehiculos [R=301,L]
+RewriteRule ^categoria/venta-de-vehiculos/?$ /categoria/vehiculos [R=301,L]
+RewriteRule ^categoria/motos-scooters-y-bicicletas/?$ /categoria/vehiculos [R=301,L]
+RewriteRule ^categoria/llantas/?$ /categoria/mecanicos [R=301,L]
+RewriteRule ^categoria/talleres-de-mecanica/?$ /categoria/mecanicos [R=301,L]
+RewriteRule ^categoria/alquiler_de_scooters_electricos/?$ /categoria/alquileres [R=301,L]
+RewriteRule ^categoria/alquiler-de-herramientas/?$ /categoria/alquileres [R=301,L]
+RewriteRule ^categoria/alquiler_de_drones/?$ /categoria/alquileres [R=301,L]
+RewriteRule ^categoria/cajeros_de_criptomonedas/?$ /categoria/bancos-agentes-y-pagos [R=301,L]
+RewriteRule ^categoria/casas_de_cambio_digital/?$ /categoria/bancos-agentes-y-pagos [R=301,L]
+RewriteRule ^categoria/fintech_y_billeteras_digitales/?$ /categoria/bancos-agentes-y-pagos [R=301,L]
+RewriteRule ^categoria/prestamos-y-financiamiento/?$ /categoria/bancos-agentes-y-pagos [R=301,L]
+RewriteRule ^categoria/locutorios-y-pagos/?$ /categoria/bancos-agentes-y-pagos [R=301,L]
+RewriteRule ^categoria/puntos-de-pago-hidrandina/?$ /categoria/bancos-agentes-y-pagos [R=301,L]
+RewriteRule ^categoria/contabilidad-y-tramites/?$ /categoria/abogados [R=301,L]
+RewriteRule ^categoria/juzgados-y-tramites/?$ /categoria/abogados [R=301,L]
+RewriteRule ^categoria/colegios-e-institutos/?$ /categoria/educacion [R=301,L]
+RewriteRule ^categoria/cursos-y-talleres/?$ /categoria/educacion [R=301,L]
+RewriteRule ^categoria/manejo/?$ /categoria/educacion [R=301,L]
+RewriteRule ^categoria/mudanzas-y-fletes/?$ /categoria/transporte [R=301,L]
+RewriteRule ^categoria/encomiendas-y-carga/?$ /categoria/transporte [R=301,L]
+RewriteRule ^categoria/transporte-interprovincial/?$ /categoria/transporte [R=301,L]
+RewriteRule ^categoria/lavado-de-autos/?$ /categoria/lavanderias [R=301,L]
+RewriteRule ^categoria/limpieza/?$ /categoria/lavanderias [R=301,L]
+RewriteRule ^categoria/estampados-y-sublimados/?$ /categoria/imprentas-y-publicidad [R=301,L]
+RewriteRule ^categoria/servicios_de_impresion_3d/?$ /categoria/imprentas-y-publicidad [R=301,L]
+RewriteRule ^categoria/eventos_y_decoracion_tematica/?$ /categoria/eventos [R=301,L]
+RewriteRule ^categoria/eventos-dj-animacion-y-shows/?$ /categoria/eventos [R=301,L]
+RewriteRule ^categoria/animacion-infantil/?$ /categoria/eventos [R=301,L]
+RewriteRule ^categoria/ositos-sorpresa-y-botargas/?$ /categoria/eventos [R=301,L]
+RewriteRule ^categoria/musica/?$ /categoria/eventos [R=301,L]
+RewriteRule ^categoria/fotografia/?$ /categoria/eventos [R=301,L]
+RewriteRule ^categoria/alquiler-de-local-para-eventos/?$ /categoria/eventos [R=301,L]
+RewriteRule ^categoria/salas_de_escape_room/?$ /categoria/juegos [R=301,L]
+RewriteRule ^categoria/centros_de_esports/?$ /categoria/juegos [R=301,L]
+RewriteRule ^categoria/estudios_de_piercing/?$ /categoria/personalizados [R=301,L]
+RewriteRule ^categoria/tiendas_de_vapeadores/?$ /categoria/personalizados [R=301,L]
+RewriteRule ^categoria/florerias-y-regalos/?$ /categoria/personalizados [R=301,L]
+RewriteRule ^categoria/estudios_de_tatuajes/?$ /categoria/personalizados [R=301,L]
+RewriteRule ^categoria/grifos/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/mercados-y-ferias/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/paraderos-y-terminales/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/plazas-y-parques/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/iglesias-y-templos/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/museos-y-centros-culturales/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/municipalidades/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/comisarias-y-serenazgo/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/entidades-publicas/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/playas-y-balnearios/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/zonas-de-descanso/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/miradores-y-malecon/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/monumentos-y-balcones/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/turismo-y-agencias-de-viaje/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/sastrerias-y-confecciones/?$ /categoria/textil [R=301,L]
+RewriteRule ^categoria/confeccion-de-uniformes/?$ /categoria/textil [R=301,L]
+RewriteRule ^categoria/ropa-deportiva/?$ /categoria/ropa [R=301,L]
+RewriteRule ^categoria/zapaterias-y-arreglo-de-calzado/?$ /categoria/calzado [R=301,L]
+RewriteRule ^categoria/deportes/?$ /categoria/gimnasios [R=301,L]
+RewriteRule ^categoria/hoteles/?$ /categoria/habitaciones [R=301,L]
+RewriteRule ^categoria/coworking/?$ /categoria/habitaciones [R=301,L]
+RewriteRule ^categoria/hospedajes-y-cuartos/?$ /categoria/habitaciones [R=301,L]
+RewriteRule ^categoria/alquiler-de-habitaciones/?$ /categoria/habitaciones [R=301,L]
+RewriteRule ^categoria/tiendas_de_segunda_mano/?$ /categoria/ropa [R=301,L]
+RewriteRule ^categoria/agencias_de_viajes/?$ /categoria/turismo [R=301,L]
+RewriteRule ^categoria/seguridad-y-vigilancia/?$ /categoria/ferreterias [R=301,L]
+RewriteRule ^categoria/ventas-por-internet/?$ /categoria/informatica [R=301,L]
+RewriteRule ^categoria/importaciones-y-catalogos/?$ /categoria/hogar [R=301,L]
+RewriteRule ^categoria/pescaderias-y-productos-del-mar/?$ /categoria/restaurantes [R=301,L]
+RewriteRule ^categoria/([a-z0-9_\-]+)/?$ categoria.php?slug=$1 [L,QSA]
+# 🏷️ LA PÁGINA DE TODOS LOS RUBROS (módulo nuevo, 2026-09-19 — pedido del jefe, textual: *«¿existe
+#    alguna página donde yo pueda ver los rubros?… una página donde se vean TODOS los rubros. Cuando
+#    digo rubros me refiero a los NOMBRES DE LAS CATEGORÍAS, no a las tiendas ni a los productos que
+#    viven adentro»*). Es el ÍNDICE del directorio: la lista alfabética y completa de los rubros, con
+#    las tiendas que tiene cada uno, y un campo que filtra al instante mientras se escribe.
+#    El archivo es rubros.php y responde en las dos direcciones:
+#      · /rubros      → la que se comparte y se le entrega al jefe
+#      · /categorias  → la misma página, para quien lo escribe en plural
+#    ⚠️ No choca con `^categoria/<slug>` de arriba: esa exige la barra después de «categoria».
+RewriteRule ^rubros/?$ rubros.php [L,QSA]
+RewriteRule ^categorias/?$ rubros.php [L,QSA]
+
+# 🏪 EL ÁREA «NOSOTROS» (3.ª orden del jefe, 2026-09-21 — LA QUE MANDA HOY): **NADA DE ANCLAS**.
+#    Textual: *«no quiero que trabajes con anclas dentro del sitio… creo que sean páginas separadas,
+#    cada una con su área respectiva… Novedades es una página, Precios es una página, una landing page,
+#    y "Cómo se usa este sitio" también es una landing page»*.
+#    Por eso el área son CUATRO páginas con URL propia, y el visitante se mueve con el **menú interno**
+#    del área (`includes/nosotros_area.php` → `nosotros_area_menu()`):
+#      · /nosotros     → portada del área (presentación, números y accesos)   ← nosotros.php
+#      · /como-se-usa  → landing de la guía de uso                            ← como-se-usa.php
+#      · /novedades    → landing de lo que nos diferencia                     ← novedades.php
+#      · /precios      → landing de los 5 planes                              ← precios.php
+RewriteRule ^nosotros/?$ nosotros.php [L,QSA]
+RewriteRule ^como-se-usa/?$ como-se-usa.php [L,QSA]
+RewriteRule ^novedades/?$ novedades.php [L,QSA]
+RewriteRule ^precios/?$ precios.php [L,QSA]
+
+# 🔒 POLÍTICAS DE PRIVACIDAD Y CONDICIONES GENERALES DE USO (módulo del 2026-09-21).
+#    · /privacidad  → la portada del documento (preámbulo, resumen ejecutivo y menú de capítulos)
+#    · /privacidad/<capítulo> → **cada capítulo es una página propia** (sin anclas): el texto de cada
+#      capítulo va en su URL y el menú interno lleva de una página a otra.
+#    ⚠️ Antes de esto, el pie apuntaba a `terminos.php` y a `privacidad.php` y NINGUNO de los dos
+#    archivos existía: los dos respondían 404 en el hosting.
+RewriteRule ^privacidad/?$ privacidad.php [L,QSA]
+RewriteRule ^politicas-de-privacidad/?$ privacidad.php [L,QSA]
+RewriteRule ^privacidad/([a-z0-9\-]+)/?$ privacidad.php?cap=$1 [L,QSA]
+#    /terminos lleva a la portada del documento (sin ancla): el 301 lo hace el PHP (privacidad.php).
+RewriteRule ^terminos/?$ privacidad.php [L,QSA]
+
+# 📚 LA DOCUMENTACIÓN OFICIAL COMPLETA: los tres documentos formales —Políticas, Preguntas Frecuentes y
+#    Manual de Uso— con su versión web (**una página por capítulo**) y su descarga en PDF.
+#    El texto vive UNA sola vez en `includes/doc_legal.php`; lo pintan `includes/doc_vista.php` (web) e
+#    `includes/doc_pdf.php` + `includes/pdf_simple.php` (PDF, generado al vuelo: no se guarda ningún
+#    archivo en el hosting, así nunca queda publicado un PDF viejo).
+RewriteRule ^preguntas-frecuentes/?$ preguntas-frecuentes.php [L,QSA]
+RewriteRule ^faq/?$ preguntas-frecuentes.php [L,QSA]
+RewriteRule ^preguntas-frecuentes/([a-z0-9\-]+)/?$ preguntas-frecuentes.php?cap=$1 [L,QSA]
+RewriteRule ^manual-de-uso/?$ manual.php [L,QSA]
+RewriteRule ^manual/?$ manual.php [L,QSA]
+RewriteRule ^manual-de-uso/([a-z0-9\-]+)/?$ manual.php?cap=$1 [L,QSA]
+RewriteRule ^documentos/privacidad\.pdf$ documento_pdf.php?doc=privacidad [L,QSA]
+RewriteRule ^documentos/preguntas-frecuentes\.pdf$ documento_pdf.php?doc=faq [L,QSA]
+RewriteRule ^documentos/manual\.pdf$ documento_pdf.php?doc=manual [L,QSA]
+RewriteRule ^distrito/([a-z0-9_\-]+)/?$ distrito.php?slug=$1 [L,QSA]
+RewriteRule ^perfil/?$ panel.php [L,QSA]
+# 👤 LA PÁGINA DEL PERFIL (2026-09-19, idea y orden del jefe): **un número de teléfono = un perfil**.
+#    El jefe lo pidió con su ejemplo textual: *«así lo vamos a llamar a los perfiles:
+#    dechimbote.com/perfil/999 y para el otro usuario dechimbote.com/perfil/888»*.
+#    Junta TODAS las tiendas activas que atienden con ese mismo número (aunque sean de rubros distintos
+#    y aunque vengan de cuentas de Facebook distintas): el teléfono es lo que dice quién atiende.
+#    ⚠️ El número va SOLO con dígitos para no chocar con ^perfil/?$ (que es el panel del dueño).
+RewriteRule ^perfil/([0-9]+)/?$ perfil.php?tel=$1 [L,QSA]
+RewriteRule ^api/registrar-vista/?$ api/registrar_vista.php [L,QSA]
+
+# 3.b) URLs HISTÓRICAS que la gente (y Google) sigue abriendo y que daban 404.
+#      · /reclamar?q=…&rubro=… es el enlace viejo de "reclama tu negocio": 96 visitas
+#        HUMANAS perdidas en un solo día (10/09/2026). Ojo: el reclamar.php que había
+#        en el hosting era de la arquitectura vieja y devolvía ERROR 500; se sustituyó
+#        por la página nueva con el MISMO nombre de archivo.
+#      · /buscar se pedía sin .php y también daba 404.
+RewriteRule ^reclamar/?$ reclamar.php [L,QSA]
+RewriteRule ^buscar/?$ buscar.php [L,QSA]
+
+# 3.b.1) 🤖 URL AMIGABLE PARA EL REGISTRO (2026-09-13, al instalar el chat de ayuda):
+#      El chat y sus respuestas mandan a la gente a **/registro** (así lo pide el manual y así
+#      se ve en los enlaces del sitio: /perfil, /buscar, /empleos…). Pero esa URL NO existía:
+#      /registro devolvía **404** y solo funcionaba /registro.php, así que el visitante que
+#      hacía caso al bot terminaba en la página de "no encontramos lo que buscas".
+#      Con esta regla funcionan LAS DOS. (Comprobado el 2026-09-13: /registro → 200.)
+RewriteRule ^registro/?$ registro.php [L,QSA]
+
+# 3.b.2) 💼 TABLÓN DE EMPLEOS Y ANUNCIOS (módulo nuevo, 2026-09-12).
+#      El archivo se llama empleosdb.php (nombre pedido por el jefe) y la URL pública es /empleos.
+#      Cada aviso tiene su ficha: /empleo/<slug>.
+RewriteRule ^empleos/?$ empleosdb.php [L,QSA]
+RewriteRule ^empleo/([a-z0-9\-]+)/?$ empleo.php?slug=$1 [L,QSA]
+
+# 3.b.3) 📰 LA PÁGINA DE NOTICIAS (módulo nuevo, 2026-09-13 — pedido del jefe).
+#      El jefe pidió «una página de noticias» para que el chatbot ya no mande al visitante a la
+#      noticia de OTRO medio: ahora la noticia vive aquí y el bot enlaza dentro de casa.
+#      Listado: /noticias · Cada noticia: /noticia/<slug>. Las escribe sola el robot
+#      cron/noticias_diarias.php (06:00 de Chimbote) y se citan las fuentes al pie.
+RewriteRule ^noticias/?$ noticias.php [L,QSA]
+RewriteRule ^noticia/([a-z0-9\-]+)/?$ noticia.php?slug=$1 [L,QSA]
+
+# 3.b.4) 🛠️ EL CONSTRUCTOR DE TIENDAS CON IA (módulo nuevo, 2026-09-14 — pedido del jefe).
+#      La página privada donde un usuario REGISTRADO arma su tienda conversando con
+#      «El maestro» (con su clave PROPIA de la API de DeepSeek, para poder medir el
+#      consumo aparte del chat de ayuda). El archivo es crear_tienda_ia.php.
+#        /crear-tienda                  → armar una tienda nueva
+#        /crear-tienda?modo=producto    → agregar un producto a una tienda que ya tiene
+RewriteRule ^crear-tienda/?$ crear_tienda_ia.php [L,QSA]
+
+# 3.b.4.quater) 👑 EL SUPREMO (módulo nuevo, 2026-09-18 — pedido del jefe: *«necesito que crees algo
+#      similar para mí, que soy el súper administrador, pero llamada El Supremo»*).
+#      Es la página PRIVADA del Súper Administrador para crear tiendas EN VIVO delante del cliente
+#      (el «modo vendedor»): arma la tienda como El maestro y además entrega los códigos ya escritos
+#      —la cabecera, la música y las imágenes de los productos— para pegarlos en Flow/Gemini.
+#      ⚠️ El ÚNICO enlace que existe a esta página es el botón de `superadmin.php?seccion=supremo`:
+#      no se enlaza desde ninguna página pública. El archivo es supremo.php y él mismo comprueba
+#      `es_admin()` (y su puerta `api/supremo.php` lo vuelve a comprobar en cada petición).
+RewriteRule ^supremo/?$ supremo.php [L,QSA]
+
+# 3.b.4.bis) ✏️ EL DUEÑO EDITA SU TIENDA (módulo nuevo, 2026-09-16 — pedido del jefe: *«si el dueño
+#      tiene control total de su tienda para editar, siempre debe poner su contraseña»*).
+#      El archivo es mi-tienda.php y la tienda va por su id:  /mi-tienda?n=<id>
+#      (Acepta también el nombre del archivo a pelo, por si algún enlace viejo lo usa.)
+RewriteRule ^mi-tienda/?$ mi-tienda.php [L,QSA]
+
+# 3.b.4.ter) 🔑 «OLVIDÉ MI CONTRASEÑA» (módulo nuevo, 2026-09-16 — pedido del jefe: *«¿cómo puede
+#      recuperar su contraseña el que creó su tienda con El maestro?»*). Los dueños que crea
+#      El maestro 🛠️ entran con **su WhatsApp** y su clave se les mostró UNA sola vez: si la
+#      pierden, aquí piden una nueva y el jefe se la manda por WhatsApp desde el Súper Admin.
+#      El archivo es recuperar.php y el enlace está en /login («¿Olvidaste tu contraseña?»).
+RewriteRule ^recuperar/?$ recuperar.php [L,QSA]
+
+# 3.b.5) 🔴 INFORMACIÓN EN VIVO (módulo nuevo, 2026-09-15 — pedido del jefe).
+#      El chat público de lo que pasa ahora mismo en el sitio + lo que la gente busca y nadie vende.
+#      Así se llama desde el 2026-09-15 (antes «Encargos», y antes «Pedidos sin vendedor»; la palabra
+#      «tablón» sigue retirada por su orden del 2026-09-13). El archivo es pedidos_sin_vendedor.php.
+#      · /en-vivo   → la URL nueva (la que usan el menú y el chat).
+#      · /encargos  → sigue funcionando: hay enlaces y avisos ya repartidos con esa dirección.
+#      · /pedidos   → redirige a la nueva, para no dejar enlaces rotos.
+#      Cada encargo se abre con `?p=<slug>` (lo que se comparte por WhatsApp).
+RewriteRule ^pedidos/?$ /en-vivo [R=301,L]
+RewriteRule ^encargos/?$ pedidos_sin_vendedor.php [L,QSA]
+RewriteRule ^en-vivo/?$ pedidos_sin_vendedor.php [L,QSA]
+
+# 3.b.6) 🧭 EL EXPLORER (módulo nuevo, 2026-09-16 — pedido del jefe).
+#      El área con la forma del muro de Facebook hecha con lo nuestro: las tiendas y los productos
+#      del directorio como publicaciones, los flyers como historias y los accesos a las herramientas
+#      del sitio en la barra de la izquierda. El archivo es explorer.php.
+#      · /explorer          → el muro
+#      · /explorar          → también (por si alguien lo escribe así)
+#      · /explorer?post=p-1234  → UNA publicación suelta (lo que se comparte por WhatsApp)
+RewriteRule ^explorar/?$ explorer.php [L,QSA]
+RewriteRule ^explorer/?$ explorer.php [L,QSA]
+
+# 3.c) Página de PRUEBA del asistente de marketing "Ruth": enlace corto /ruth
+#      (el archivo real es ruth.php; también funciona /ruth.php directamente).
+#      Es una página de prueba: manda X-Robots-Tag noindex desde el propio PHP.
+RewriteRule ^ruth/?$ ruth.php [L,QSA]
+
+# El sitemap que declara robots.txt (Sitemap: https://dechimbote.com/sitemap.xml) no
+# existía: robots.txt mandaba a Google a un 404.
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+# 4) Página 404 propia
+ErrorDocument 404 /404.php
+
+# 5) Bloquear acceso web a archivos sensibles (PHP sí los incluye internamente)
+<FilesMatch "^(config\.php|config_hubspot\.php|cron_reset_vistas\.php)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# 6) Bloquear acceso web a includes/
+RedirectMatch 403 ^/includes/
+
+# 7) GZIP
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript image/svg+xml
+</IfModule>
+
+# 8) Cache de estáticos
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType image/webp "access plus 6 months"
+  ExpiresByType image/svg+xml "access plus 6 months"
+  ExpiresByType image/jpeg "access plus 6 months"
+  ExpiresByType image/png "access plus 6 months"
+</IfModule>

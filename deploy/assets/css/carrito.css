@@ -1,0 +1,588 @@
+/* ============================================================
+   carrito.css — CARRITO "ME INTERESA" + "VISTOS RECIENTEMENTE"
+   ============================================================
+   Módulo: carrito por tienda con memoria local (localStorage).
+   Motor JS: assets/js/carrito.js · Guía: GUIA_RECOMENDACIONES_Y_FICHA_PRODUCTO.md §8
+
+   Móvil-primero (Regla de Oro n.º 2):
+     - botones de 34-46 px de alto (se tocan con el dedo),
+     - campos con font-size 16px (evita el zoom automático de iOS),
+     - el cajón es una hoja inferior (bottom sheet) y nunca tapa la barra del móvil,
+     - el botón flotante va a la IZQUIERDA porque la derecha es del chat de ayuda.
+   ============================================================ */
+
+/* ====== BOTÓN FLOTANTE (izquierda: la derecha es del chat de ayuda) ====== */
+.cz-fab {
+    position: fixed;
+    left: 14px;
+    bottom: 14px;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: calc(100vw - 132px);          /* deja sitio al botón del chat de ayuda */
+    background: var(--color-primario, #6d071a);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .28);
+    cursor: pointer;
+}
+.cz-fab[hidden] { display: none; }
+.cz-fab:active { transform: scale(.96); }
+.cz-fab__icon { font-size: 17px; line-height: 1; }
+.cz-fab__txt {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cz-fab__n {
+    background: var(--color-acento, #ea6a12);
+    color: #fff;
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 12.5px;
+    margin-right: 2px;
+}
+.cz-fab--latido { animation: czLatido .5s ease 2; }
+@keyframes czLatido {
+    0%, 100% { transform: scale(1); }
+    40%      { transform: scale(1.09); }
+}
+@media (min-width: 640px) { .cz-fab { padding: 14px 20px; font-size: 15px; } }
+
+/* ====== AVISO FLOTANTE (toast) ====== */
+.cz-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 84px;
+    transform: translateX(-50%) translateY(14px);
+    z-index: 1010;
+    background: #171717;
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .3);
+    max-width: calc(100vw - 32px);
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s, transform .18s;
+}
+.cz-toast--visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ====== CAJÓN DEL PEDIDO (hoja inferior) ====== */
+.cz-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 1002;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(23, 23, 23, .55);
+}
+.cz-drawer[hidden] { display: none; }
+.cz-drawer__caja {
+    background: #fff;
+    width: 100%;
+    max-width: 560px;
+    border-radius: 18px 18px 0 0;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, .18);
+}
+@media (min-width: 560px) {
+    .cz-drawer { align-items: center; }
+    .cz-drawer__caja { border-radius: 18px; margin: 0 12px; }
+}
+.cz-drawer__cab {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 16px 8px;
+}
+.cz-drawer__tit { font-size: 17px; font-weight: 800; }
+.cz-drawer__sub { font-size: 12.5px; color: var(--color-texto-claro); margin-top: 2px; }
+.cz-drawer__sub a { text-decoration: underline; text-underline-offset: 2px; }
+.cz-x {
+    background: #f3f4f6;
+    border: 0;
+    border-radius: 999px;
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+    color: #374151;
+    flex-shrink: 0;
+    cursor: pointer;
+    line-height: 1;
+}
+.cz-drawer__chips {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 0 16px 6px;
+}
+.cz-chip {
+    flex: 0 0 auto;
+    border: 1px solid var(--color-borde);
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--color-texto);
+    cursor: pointer;
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cz-chip--activo {
+    background: var(--color-primario, #6d071a);
+    border-color: var(--color-primario, #6d071a);
+    color: #fff;
+}
+.cz-drawer__lista { overflow: auto; padding: 4px 12px 0; flex: 1; }
+.cz-drawer__env {
+    margin: 4px 16px 0;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #14532d;
+    border-radius: 10px;
+    padding: 8px 11px;
+    font-size: 12.5px;
+    line-height: 1.4;
+}
+.cz-drawer__vacio {
+    text-align: center;
+    padding: 26px 18px 10px;
+    color: var(--color-texto-claro);
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+.cz-drawer__vacio b { display: block; font-size: 15px; color: var(--color-texto); margin-bottom: 6px; }
+
+/* ====== RENGLÓN DE UN PRODUCTO DENTRO DEL CAJÓN ====== */
+.cz-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 4px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.cz-item:last-child { border-bottom: 0; }
+.cz-item__img {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #f3f4f6;
+}
+.cz-item__info { flex: 1; min-width: 0; }
+.cz-item__t {
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-texto);
+}
+.cz-item__u { font-size: 11.5px; color: var(--color-texto-claro); margin-top: 2px; }
+.cz-item__q { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+.cz-qbtn {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    border: 1px solid var(--color-borde);
+    background: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-texto);
+    line-height: 1;
+    cursor: pointer;
+}
+.cz-qbtn:active { background: #f3f4f6; }
+.cz-qn { min-width: 22px; text-align: center; font-size: 14.5px; font-weight: 800; }
+.cz-item__del {
+    margin-left: auto;
+    border: 0;
+    background: none;
+    color: #b91c1c;
+    font-size: 14px;
+    padding: 4px 6px;
+    cursor: pointer;
+}
+.cz-item__sub {
+    flex: 0 0 auto;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--color-primario, #6d071a);
+    padding-top: 2px;
+}
+
+/* ====== PIE DEL CAJÓN (total + nota + enviar) ====== */
+.cz-drawer__pie {
+    border-top: 1px solid var(--color-borde);
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    background: #fff;
+}
+.cz-drawer__total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    color: var(--color-texto-claro);
+}
+.cz-drawer__total b { font-size: 19px; color: var(--color-primario, #6d071a); }
+.cz-drawer__lbl {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--color-texto-claro);
+    margin: 10px 0 5px;
+}
+.cz-drawer__nota {
+    width: 100%;
+    border: 1px solid var(--color-borde);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 16px;                          /* 16px: sin zoom automático en iOS */
+    font-family: inherit;
+    color: var(--color-texto);
+    resize: vertical;
+    outline: none;
+}
+.cz-drawer__nota:focus { border-color: var(--color-acento); box-shadow: 0 0 0 3px rgba(249, 115, 22, .15); }
+.cz-drawer__prev { margin-top: 9px; }
+.cz-drawer__prev summary {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--marca-link, #123c6b);
+    cursor: pointer;
+}
+.cz-drawer__prev pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    margin-top: 7px;
+    font-family: inherit;
+    color: var(--color-texto);
+    max-height: 190px;
+    overflow: auto;
+}
+.cz-btn {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--color-primario, #6d071a);
+    background: var(--color-primario, #6d071a);
+    color: #fff;
+    border-radius: 12px;
+    padding: 13px 16px;
+    font-size: 15.5px;
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 11px;
+}
+.cz-btn--wsp { background: #25d366; border-color: #25d366; color: #06301a; }
+.cz-btn--wsp:active { background: #1eb955; }
+.cz-drawer__acciones { display: flex; gap: 8px; margin-top: 8px; }
+.cz-btn--ghost {
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    color: var(--color-texto);
+    font-weight: 700;
+    font-size: 13.5px;
+    margin-top: 0;
+    padding: 10px 12px;
+}
+.cz-drawer__aviso {
+    font-size: 11.5px;
+    color: var(--color-texto-claro);
+    line-height: 1.45;
+    margin-top: 10px;
+}
+
+/* ====== FICHA RÁPIDA DEL PRODUCTO (se abre al tocar una tarjeta) ====== */
+.cz-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 1003;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(23, 23, 23, .55);
+}
+.cz-sheet[hidden] { display: none; }
+.cz-sheet__caja {
+    background: #fff;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 18px 18px 0 0;
+    max-height: 92vh;
+    overflow: auto;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, .18);
+}
+@media (min-width: 560px) {
+    .cz-sheet { align-items: center; }
+    .cz-sheet__caja { border-radius: 18px; margin: 0 12px; }
+}
+.cz-sheet__img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #f3f4f6; }
+.cz-sheet__cuerpo { padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+.cz-sheet__cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.cz-sheet__t { font-size: 18px; font-weight: 800; line-height: 1.25; }
+.cz-sheet__u { font-size: 12.5px; color: var(--color-texto-claro); margin-top: 3px; }
+.cz-sheet__p { font-size: 20px; font-weight: 800; color: var(--color-primario, #6d071a); margin-top: 8px; }
+.cz-sheet__d { font-size: 14px; color: #374151; line-height: 1.55; margin-top: 10px; white-space: pre-line; }
+.cz-sheet__tienda {
+    font-size: 12.5px;
+    color: var(--color-texto-claro);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 11px;
+    margin-top: 12px;
+    line-height: 1.45;
+}
+.cz-sheet__tienda a { font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.cz-sheet__fila { display: flex; gap: 8px; margin-top: 12px; }
+.cz-sheet__fila .cz-btn { margin-top: 0; }
+.cz-btn--suave {
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    color: var(--color-texto);
+}
+/* 🔴 EL BOTÓN DE CONSULTAR DEL PRODUCTO ES UNA IMAGEN (2026-09-16, orden del jefe): la imagen
+   del botón rojo «CONSULTAR PRODUCTO» (WebP de 15 KB con transparencia) sustituye al botón
+   blanco de texto de la ficha rápida. Caja sin fondo, sin borde y sin relleno: SOLO la imagen,
+   centrada y con un tope de ancho para que no se vea gigante en la computadora. */
+.cz-btnimg {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    margin: 14px auto 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    line-height: 0;
+    cursor: pointer;
+}
+.cz-btnimg img { display: block; width: 100%; height: auto; }
+.cz-btnimg:active { transform: scale(.98); }
+.cz-btn--activo { background: var(--color-primario, #6d071a); border-color: var(--color-primario, #6d071a); color: #fff; }
+.cz-btn__n { font-weight: 800; }
+
+/* ====== TARJETAS DE PRODUCTO CON "ME INTERESA" ====== */
+.cz-prod { cursor: pointer; }
+.cz-prod--en { box-shadow: 0 0 0 2px var(--color-primario, #6d071a) inset; }
+.cz-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--color-borde);
+    background: #fff;
+    color: var(--color-texto);
+    border-radius: 999px;
+    padding: 10px 14px;                       /* 10px: dedo, no ratón */
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.1;
+    cursor: pointer;
+    margin-top: 8px;
+    min-height: 38px;
+}
+.cz-add:active { transform: scale(.97); }
+.cz-add--en {
+    background: var(--color-primario, #6d071a);
+    border-color: var(--color-primario, #6d071a);
+    color: #fff;
+}
+/* Botón redondo sobre la foto (portada y "Ofertas de última hora")
+   ── Rediseñado el 2026-09-10 a pedido del jefe: antes era el emoji ❤️ (rojo y lleno), que
+   parecía YA ELEGIDO. Ahora por defecto es un corazón VACÍO gris apagado (esperando el clic) y
+   al pulsarlo se enciende: círculo ROJO con el corazón BLANCO. */
+.cz-add--flotante {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    width: 38px;
+    height: 38px;
+    min-height: 38px;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    border: 0;
+    background: rgba(255, 255, 255, .92);
+    color: #b6b6b6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .16);
+    z-index: 2;
+    transition: background .15s ease, color .15s ease, transform .12s ease;
+}
+.cz-add--flotante svg { display: block; width: 21px; height: 21px; }
+.cz-add--flotante .cz-add__lleno { display: none; }   /* el corazón lleno solo aparece al pulsar */
+.cz-add--flotante:hover { color: #8d8d8d; }
+.cz-add--flotante.cz-add--en {
+    background: #e11d48;
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(225, 29, 72, .45);
+    animation: czCorazonLate .45s ease-out;
+}
+.cz-add--flotante.cz-add--en .cz-add__vacio { display: none; }
+.cz-add--flotante.cz-add--en .cz-add__lleno { display: block; }
+@keyframes czCorazonLate {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.24); }
+    100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cz-add--flotante.cz-add--en { animation: none; }
+}
+
+.cz-aviso-meinteresa {
+    font-size: 12.5px;
+    color: var(--color-texto-claro);
+    line-height: 1.5;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    border-radius: 10px;
+    padding: 9px 11px;
+    margin-bottom: 12px;
+}
+
+/* ====== FILA "VISTOS RECIENTEMENTE" ====== */
+.cz-vistos[hidden] { display: none; }
+.cz-vistos .carrusel-tiendas { padding-bottom: 6px; }
+.cz-vcard { flex: 0 0 146px; scroll-snap-align: start; }
+.cz-vcard__img { position: relative; }
+/* En estas tarjetas el jefe pidió (2026-09-10) que el PROTAGONISTA sea el nombre de la tienda,
+   más grande, y que NO se ponga el precio. Debajo va el producto en letra chica (decisión de
+   diseño del agente: sin eso la tarjeta no dice qué oferta es). */
+.cz-vcard__tienda {
+    font-size: 14.5px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--color-texto);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.cz-vcard__prod {
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--color-texto-claro);
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   BLOQUE "⚡ OFERTAS DE ÚLTIMA HORA" CON CONTADOR
+   Pedido del jefe (2026-09-10): un bloque con borde y de UN SOLO COLOR, con el título arriba y
+   abajo el contador de días, horas, minutos y segundos, con los números girando al cambiar.
+   Lo pinta assets/js/carrito.js (sección 7.bis).
+   ========================================================================== */
+.cz-oferta {
+    background: linear-gradient(135deg, var(--color-primario, #6d071a) 0%, #4a0512 100%);
+    border: 2px solid #e6c37a;
+    border-radius: 16px;
+    padding: 12px 14px 14px;
+    color: #fff;
+    margin-bottom: 12px;
+    box-shadow: var(--sombra-tarjeta);
+}
+.cz-oferta__titulo {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    margin-bottom: 10px;
+}
+.cz-oferta__reloj { display: flex; gap: 8px; justify-content: center; max-width: 520px; margin: 0 auto; }
+.cz-oferta__caja {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 118px;
+    background: rgba(0, 0, 0, .3);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 11px;
+    padding: 7px 4px 6px;
+    text-align: center;
+    perspective: 320px;        /* para que el número "gire" en 3D */
+}
+.cz-oferta__n {
+    display: block;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+}
+@media (min-width: 700px) { .cz-oferta__n { font-size: 30px; } }
+.cz-oferta__u {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    opacity: .82;
+}
+.cz-oferta__caja--gira .cz-oferta__n { animation: czGira .42s ease-out; }
+@keyframes czGira {
+    0%   { transform: rotateX(-90deg); opacity: .2; }
+    60%  { transform: rotateX(14deg);  opacity: 1; }
+    100% { transform: rotateX(0deg);   opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cz-oferta__caja--gira .cz-oferta__n { animation: none; }
+}
+@media (max-width: 420px) {
+    .cz-oferta__n { font-size: 20px; }
+    .cz-oferta__u { font-size: 9.5px; }
+}
+.cz-vcard__quitar {
+    border: 0;
+    background: none;
+    color: var(--marca-link, #123c6b);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    padding: 0;
+}
+.cz-vcard__hecho {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(109, 7, 26, .92);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+.cz-vcard__hecho[hidden] { display: none; }
+.cz-aviso-meinteresa[hidden] { display: none; }
+.cz-privacidad {
+    font-size: 11.5px;
+    color: var(--color-texto-claro);
+    margin-top: 6px;
+    line-height: 1.45;
+}

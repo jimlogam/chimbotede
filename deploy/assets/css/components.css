@@ -1,0 +1,1883 @@
+/* ============================================================
+   CHIMBOTE AL DÍA — COMPONENTES (topbar, footer, cards, etc.)
+   ============================================================ */
+
+/* ====== BANDA DE LA MARCA (va ARRIBA de la cabecera fija) ======
+   Pedido del jefe (2026-09-10): al bajar, arriba deben quedar SOLO el buscador y los rubros.
+   La marca "DeChimbote.com" y el menú ☰ viven aquí, en una banda que NO es fija (no lleva
+   position: sticky), así que se van solas con el scroll y vuelven al subir. Mientras tanto
+   <header class="topbar"> sí es fija y mantiene el buscador + la marquesina de rubros. */
+.marca-banda {
+    background: linear-gradient(135deg, var(--marca-granate) 0%, var(--marca-granate-osc) 100%);
+    color: #fff;
+}
+.marca-banda .topbar__barra {
+    max-width: var(--max-ancho);
+    margin: 0 auto;
+    padding: 10px 14px;
+}
+
+/* ====== TOPBAR ====== */
+.topbar {
+    background: linear-gradient(135deg, var(--marca-granate) 0%, var(--marca-granate-osc) 100%);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 6px rgba(74,5,18,0.35);
+}
+
+/* ====== CABECERA (rediseño 2026-09-10, pedido del jefe) ======
+   La cabecera FIJA lleva solo el buscador grande y la marquesina de rubros; la marca y el menú
+   hamburguesa van en la banda de arriba (.marca-banda), que se va con el scroll.
+   Antes la barra tenía 5 botones con iconos: en móvil no cabían y "Salir" ni se veía. */
+.topbar__inner {
+    max-width: var(--max-ancho);
+    margin: 0 auto;
+    padding: 8px 14px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.topbar__barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+}
+
+/* La marca es el LOGO EN IMAGEN (2026-09-15, orden del jefe): aquí decía el texto
+   "📍 Chimbote.xyz" y se anuló. El archivo es blanco CON TRANSPARENCIA (el fondo granate
+   del recorte se volvió transparente), así que se apoya en esta banda —que es un degradado
+   de granates— sin que se vea el rectángulo del recorte.
+   El logo es muy apaisado (593 × 67), por eso en escritorio manda el ALTO y en móvil el ANCHO. */
+.topbar__logo {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+.topbar__logo-img { display: block; height: 44px; width: auto; }
+
+/* Botón del menú hamburguesa */
+.topbar__burger {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.32);
+    border-radius: 999px;
+    color: #fff;
+    font: 700 14px/1 inherit;
+    padding: 9px 15px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .15s ease;
+}
+.topbar__burger:hover { background: rgba(255,255,255,.2); }
+.topbar__burger:active { transform: scale(.97); }
+.topbar__burger-lineas { display: inline-flex; flex-direction: column; gap: 4px; }
+.topbar__burger-lineas span {
+    display: block; width: 20px; height: 2px; border-radius: 2px; background: #fff;
+    transition: transform .18s ease, opacity .18s ease;
+}
+.topbar__burger.is-abierto .topbar__burger-lineas span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.topbar__burger.is-abierto .topbar__burger-lineas span:nth-child(2) { opacity: 0; }
+.topbar__burger.is-abierto .topbar__burger-lineas span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.topbar__burger-txt { font-size: 14px; }
+
+/* ⚠️ HAY DOS COPIAS DE LA MARCA Y DOS BOTONES ☰ (2026-09-20): la de CELULAR, que vive en la banda
+   de arriba (.marca-banda), y la de PC, que va en la MISMA FILA del buscador. De fábrica (celular)
+   solo se pinta la de la banda; la de PC la enciende la media query de escritorio (más abajo).
+   Las dos clases --pc van DESPUÉS de sus reglas base a propósito: así las apagan sin `!important`. */
+.topbar__logo--pc,
+.topbar__burger--pc { display: none; }
+
+/* Buscador grande y centrado */
+.topbar__search {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 999px;
+    padding: 5px 6px 5px 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.16);
+}
+
+.topbar__search input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    color: #3a3a3a;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+}
+
+.topbar__search input::placeholder { color: #9d8c88; }
+
+/* Botón de ENTER invisible: mantiene el envío con ENTER en todos los navegadores
+   aunque la lupa ya no se muestre (pedido del jefe: la lupa sobraba). */
+.sr-solo {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.topbar__search .sr-solo { padding: 0; color: transparent; background: transparent; }
+
+/* ====== BUSCADOR PREDICTIVO ====== */
+.pred-wrap { position: relative; }
+.topbar__search .pred-wrap { flex: 1; display: flex; min-width: 0; }
+.pred-wrap input { width: 100%; }
+.pred-sug {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 300;
+  background: #fff; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  overflow: hidden; text-align: left; max-height: 70vh; overflow-y: auto;
+}
+.pred-sug__grupo { font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing:.05em; color: var(--marca-granate); padding: 8px 12px 2px; background:#fdf6f3; }
+.pred-item {
+  display: block; padding: 9px 12px; color: var(--color-texto); font-size: 14px;
+  border-top: 1px solid var(--color-borde); cursor: pointer; text-decoration: none;
+}
+.pred-item:hover { background: var(--marca-crema); }
+.pred-item .pre { font-weight:600; color:var(--color-texto); }
+.pred-item .meta { font-size:11px; color:var(--color-texto-claro); display:block; }
+.pred-item .precio { color:var(--marca-granate); font-weight:700; }
+.pred-item em { background:#ffe9a8; font-style:normal; }
+.pred-vacio { padding: 12px; color: var(--color-texto-claro); font-size: 13px; }
+
+/* ====== BUSCADOR FUZZY (Fuse.js) — buscador_fuzzy.js ====== */
+.dropdown-fuzzy { /* hereda el aspecto de .pred-sug */ }
+.dropdown-fuzzy__item.is-sel,
+.dropdown-fuzzy__item:hover { background: var(--marca-crema); }
+.dropdown-fuzzy__item.is-sel { box-shadow: inset 3px 0 0 var(--marca-granate); }
+.dropdown-fuzzy__item .meta { font-size: 12px; }
+.dropdown-fuzzy__ver {
+  display: block; padding: 11px 12px; font-size: 13px; font-weight: 700;
+  color: var(--marca-granate); background: #fdf6f3; text-decoration: none;
+  border-top: 1px solid var(--color-borde);
+}
+.dropdown-fuzzy__ver:hover { background: var(--marca-crema); }
+/* Bloque "¿Buscabas alguno de estos?" que se pinta en la página sin resultados */
+.dropdown-fuzzy__sugerencias {
+  background: #fff; border: 1px solid var(--color-borde); border-radius: 12px;
+  box-shadow: var(--sombra-tarjeta); padding: 12px 12px 6px; margin: 0 0 16px;
+}
+.dropdown-fuzzy__sug-titulo { font-size: 15px; font-weight: 700; color: var(--color-texto); margin: 0 0 10px; }
+.dropdown-fuzzy__lista .dropdown-fuzzy__item { border: 1px solid var(--color-borde); border-radius: 10px; margin-bottom: 8px; }
+.dropdown-fuzzy__sug-pie { margin: 2px 0 8px; font-size: 13px; font-weight: 700; }
+.dropdown-fuzzy__sug-pie a { color: var(--marca-granate); text-decoration: none; }
+/* Móvil-primero: 16 px evita el zoom automático de iOS al tocar el campo */
+@media (max-width: 640px) {
+  .topbar__search input { font-size: 16px; }
+  .dropdown-fuzzy__item { font-size: 15px; }
+}
+
+
+.topbar__search button {
+    background: transparent;
+    color: #fff;
+    padding: 0 12px;
+    font-size: 16px;
+}
+
+.topbar__nav {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.topbar__btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.topbar__btn:hover { background: rgba(255,255,255,0.2); }
+
+.topbar__btn--primary { background: var(--marca-naranja); color: #fff; }
+.topbar__btn--primary:hover { background: var(--marca-naranja-osc); }
+
+.topbar__btn--salir { background: rgba(255,255,255,0.08); color: #ffe3e8; }
+.topbar__btn--salir:hover { background: rgba(220,38,38,0.9); color: #fff; }
+/* En móvil el botón Salir siempre se ve como ícono circular táctil */
+.topbar__btn--salir .topbar__btn-icon { font-size: 15px; line-height: 1; }
+
+.topbar__btn--admin { background: var(--marca-granate-osc); color: var(--marca-crema); border:1px solid rgba(255,255,255,.3); }
+.topbar__btn--admin:hover { background: #7c3aed; }
+
+.topbar__cats {
+    max-width: var(--max-ancho);
+    margin: 0 auto;
+    padding: 0 10px 8px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.topbar__cats::-webkit-scrollbar { display: none; }
+
+.topbar__cats a {
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.topbar__cats a:hover { background: rgba(255,255,255,0.2); }
+
+.topbar__cats a.is-active {
+    background: var(--marca-crema);
+    color: var(--marca-granate);
+    font-weight: 600;
+}
+
+/* ====== (2026-09-13) AQUÍ VIVÍA LA BANDA DEL CHAT COMUNITARIO ======
+   El jefe ordenó retirar del sitio ese chat completo, así que la regla de esa franja
+   granate (la que pintaba includes/chat_mini.php desde header.php) ya no existe.
+   No volver a añadirla. */
+
+/* ====== MAIN ====== */
+.main {
+    max-width: var(--max-ancho);
+    margin: 0 auto;
+    padding: 16px;
+    min-height: 60vh;
+}
+
+/* ====== FLASH MESSAGES ====== */
+.flash-container {
+    max-width: var(--max-ancho);
+    margin: 8px auto 0;
+    padding: 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.flash {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    border-left: 4px solid;
+}
+
+.flash--info    { background: #eff6ff; color: #1e40af; border-color: #3b82f6; }
+.flash--exito   { background: #f0fdf4; color: #15803d; border-color: #22c55e; }
+.flash--error   { background: #fef2f2; color: #b91c1c; border-color: #ef4444; }
+.flash--warning { background: #fffbeb; color: #b45309; border-color: #f59e0b; }
+
+/* ====== CARDS DE NEGOCIO (portada, buscador, categoría) ====== */
+.grid-negocios {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+.card-negocio {
+    background: var(--color-fondo-tarjeta);
+    border-radius: var(--radio-borde);
+    overflow: hidden;
+    box-shadow: var(--sombra-tarjeta);
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid var(--color-borde);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-negocio:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-hover);
+}
+
+.card-negocio__imagen {
+    aspect-ratio: 16 / 10;
+    background: #f3f4f6;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-negocio__imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-negocio__badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--color-acento);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.card-negocio__destacado {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #fbbf24;
+    color: #78350f;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.card-negocio__body {
+    padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-negocio__titulo {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--color-texto);
+    line-height: 1.25;
+}
+
+.card-negocio__categoria {
+    font-size: 12px;
+    color: var(--color-texto-claro);
+    margin-bottom: 8px;
+}
+
+.card-negocio__categoria .icono {
+    margin-right: 4px;
+}
+
+.card-negocio__meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--color-texto-claro);
+    margin-top: auto;
+}
+
+.card-negocio__rating {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+/* ====== GRID DE PRODUCTOS EN PORTADA (5x2) ====== */
+.grid-productos {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+.card-producto {
+    background: var(--color-fondo-tarjeta);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-borde);
+    box-shadow: var(--sombra-tarjeta);
+    display: flex;
+    flex-direction: column;
+    transition: transform .15s, box-shadow .15s;
+    text-decoration: none;
+    color: inherit;
+}
+.card-producto:hover { transform: translateY(-2px); box-shadow: var(--sombra-hover); }
+.card-producto__img {
+    position: relative;
+    /* Foto más baja a propósito (pedido del jefe 2026-09-10): antes era cuadrada (1/1) y
+       ocupaba mucho; ahora la altura es el 70 % del ancho, así la tarjeta es más compacta. */
+    aspect-ratio: 10 / 7;
+    background: #f3f4f6;
+    overflow: hidden;
+}
+.card-producto__img img { width:100%; height:100%; object-fit:cover; }
+.card-producto__img .tag-top {
+    position:absolute; top:6px; left:6px; background:#fbbf24; color:#78350f;
+    font-size:10px; font-weight:700; padding:2px 6px; border-radius:6px;
+}
+.card-producto__body { padding:8px 9px; display:flex; flex-direction:column; flex:1; }
+.card-producto__titulo { font-size:13px; font-weight:600; line-height:1.25; color:var(--color-texto);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.card-producto__negocio { font-size:11px; color:var(--color-texto-claro); margin-top:2px;
+    display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.card-producto__precio { margin-top:auto; padding-top:5px; font-weight:700; color:var(--color-primario); font-size:14px; }
+.card-producto__precio .uni { font-weight:400; color:var(--color-texto-claro); font-size:11px; }
+
+@media (max-width: 900px){ .grid-productos{ grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 560px){ .grid-productos{ grid-template-columns: repeat(2,1fr); gap:9px; } }
+
+/* ====== CARRUSEL DE PRODUCTOS EN PORTADA (6 por fila, con scroll lateral) ======
+   Pedido del jefe (2026-09-10): en vez de la cuadrícula, cada fila lleva 6 productos y se
+   desliza de lado. En CELULAR se ven 2 completos y un pedazo del 3.º (44 % cada uno), para que
+   se entienda que hay más al costado; en escritorio entran los 6 justos y no hace falta scroll.
+   Lo pinta index.php: 4 filas = 24 productos, con banners de publicidad en medio. */
+.carrusel-productos {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 2px 0 6px;
+}
+.carrusel-productos::-webkit-scrollbar { display: none; }
+.carrusel-productos > .card-producto {
+    flex: 0 0 42%;                 /* celular: 2 completos + un pedazo del tercero (~2 y 1/3) */
+    scroll-snap-align: start;
+}
+@media (min-width: 560px) { .carrusel-productos > .card-producto { flex: 0 0 31%; } }
+@media (min-width: 760px) { .carrusel-productos > .card-producto { flex: 0 0 calc((100% - 50px) / 6); } }
+
+/* ====== NEGOCIOS EN DOS COLUMNAS TAMBIÉN EN CELULAR (solo portada) ======
+   Pedido del jefe: "Negocios para ti" y "Más vistos" siempre en DOS columnas. Se usa la clase
+   extra .grid-negocios--dos SOLO en la portada: las demás páginas (buscador, categoría) siguen
+   con su rejilla actual. Lleva las dos clases juntas para ganar a la regla de móvil global. */
+.grid-negocios.grid-negocios--dos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (max-width: 640px) {
+    .grid-negocios--dos .card-negocio__body { padding: 9px; }
+    .grid-negocios--dos .card-negocio__titulo { font-size: 14px; }
+    .grid-negocios--dos .card-negocio__categoria,
+    .grid-negocios--dos .card-negocio__meta { font-size: 11px; }
+}
+
+/* ====== CARRUSEL DE TIENDAS RECOMENDADAS (fichas apaisadas) ====== */
+/* 🚫 SIN BARRA DESLIZADORA (orden del jefe, 2026-09-16, textual): *«abajo de cada scroll has puesto
+   como una especie de barra deslizadora que no es necesario que vaya»*. Antes llevaba
+   `scrollbar-width: thin` y en PC se veía una barra fina debajo de CADA fila (el bloque de «Nuevos
+   ingresos» tiene dos, y las filas de productos del ciclo también). Ahora va como el carrusel de
+   productos (`.carrusel-productos`): **sin barra en ningún navegador**. El bloque se sigue deslizando
+   con el dedo, la rueda o el trackpad — solo se quita el adorno.
+   ⚠️ Fue el CSS de `components.css`: este archivo se sirve con marca de versión, así que el cambio
+   solo se ve al subir con su `?v=` nuevo. */
+.carrusel-tiendas {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.carrusel-tiendas::-webkit-scrollbar { display: none; }
+.card-tienda-h {
+    flex: 0 0 240px;
+    scroll-snap-align: start;
+    background: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--sombra-tarjeta);
+    display: flex;
+    flex-direction: row;          /* apaisada: imagen izquierda + info derecha */
+    text-decoration: none;
+    color: inherit;
+    transition: transform .15s, box-shadow .15s;
+}
+.card-tienda-h:hover { transform: translateY(-2px); box-shadow: var(--sombra-hover); }
+.card-tienda-h__img { position: relative; width: 108px; flex: 0 0 108px; background:#f3f4f6; overflow:hidden; }
+.card-tienda-h__img img { width:100%; height:100%; object-fit:cover; }
+.card-tienda-h__badge { position:absolute; top:5px; left:5px; background:rgba(109,7,26,.9); color:#fff; width:24px;height:24px;border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:13px; }
+.card-tienda-h__body { flex:1; padding:8px 10px; display:flex; flex-direction:column; min-width:0; }
+.card-tienda-h__titulo { font-size:13px; font-weight:700; line-height:1.25; color:var(--color-texto);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.card-tienda-h__meta { font-size:11px; color:var(--color-texto-claro); margin-top:3px;
+    display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.card-tienda-h__meta2 { margin-top:auto; padding-top:6px; font-size:11px; color:var(--color-texto-claro); }
+@media (max-width: 480px){ .card-tienda-h{ flex-basis: 205px; } .card-tienda-h__img{ width:90px; flex-basis:90px; } }
+
+/* ====== SECCIONES PORTADA ====== */
+.seccion {
+    margin-bottom: 32px;
+}
+
+/* Versión compacta (portada): las filas de productos van más juntas entre sí y con los banners,
+   para que la página se vea apretada y no con tanto aire (pedido del jefe 2026-09-10). */
+.seccion--compacta { margin-bottom: 10px; }
+
+.seccion__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.seccion__titulo {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-texto);
+}
+
+.seccion__ver-todas {
+    font-size: 13px;
+    color: var(--color-acento);
+    font-weight: 600;
+}
+
+/* ====== HERO PORTADA ====== */
+.hero {
+    background: linear-gradient(135deg, var(--marca-granate) 0%, var(--marca-granate-osc) 100%);
+    color: var(--marca-crema);
+    border: 1px solid rgba(247,239,226,.25);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.hero__titulo {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.hero__sub {
+    font-size: 15px;
+    opacity: 0.95;
+    margin-bottom: 16px;
+}
+
+.hero__cta {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--marca-naranja);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 700;
+}
+.hero__cta:hover { background: var(--marca-naranja-osc); }
+
+/* ====== FORMULARIOS ====== */
+.form {
+    max-width: 400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: var(--radio-borde);
+    padding: 24px;
+    box-shadow: var(--sombra-tarjeta);
+}
+
+.form__group {
+    margin-bottom: 16px;
+}
+
+.form__label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--color-texto);
+}
+
+.form__input,
+.form__select,
+.form__textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--color-borde);
+    font-size: 15px;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form__input:focus,
+.form__select:focus,
+.form__textarea:focus {
+    outline: none;
+    border-color: var(--color-acento);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.form__textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form__checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    background: var(--color-acento);
+    color: #fff;
+    transition: background 0.15s;
+    border: 0;
+    cursor: pointer;
+}
+
+.btn:hover { background: var(--color-primario); }
+
+.btn--block { width: 100%; }
+.btn--outline { background: transparent; color: var(--color-primario); border: 1px solid var(--color-primario); }
+.btn--wsp { background: var(--color-wsp); }
+
+/* ====== EMPTY STATE ====== */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-texto-claro);
+}
+
+.empty-state__icono {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.empty-state__titulo {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-texto);
+    margin-bottom: 6px;
+}
+
+/* ====== FOOTER ====== */
+.footer {
+    background: linear-gradient(135deg, var(--marca-granate-osc) 0%, var(--marca-granate) 100%);
+    color: var(--marca-crema);
+    margin-top: 40px;
+    padding: 32px 16px 16px;
+}
+
+.footer__inner {
+    max-width: var(--max-ancho);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(247,239,226,.2);
+}
+
+.footer__col h4 {
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.footer__col p {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.footer__col ul li {
+    margin-bottom: 6px;
+}
+
+.footer__col ul li a {
+    font-size: 13px;
+    color: var(--marca-crema);
+    opacity: .85;
+}
+
+.footer__col ul li a:hover { color: #fff; opacity: 1; }
+
+.footer__copy {
+    max-width: var(--max-ancho);
+    margin: 16px auto 0;
+    text-align: center;
+    font-size: 12px;
+    color: var(--marca-crema);
+    opacity: .7;
+}
+
+/* ====== BUSCADOR POR VOZ (Web Speech API) — buscador_voz.js ======
+   El micrófono lo pinta el JS al lado de cada buscador (#buscador-fuzzy / [data-fuzzy]).
+   Si el navegador no soporta la Web Speech API, el botón NO existe (nunca un botón muerto). */
+.pred-wrap--voz input { padding-right: 54px; }
+.topbar__search .pred-wrap--voz input { padding-right: 56px; }
+
+.btn-voz {
+    position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 42px; min-width: 42px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border: 0; border-radius: 50%;
+    background: var(--marca-naranja, #ea6a12); color: #fff;
+    line-height: 1; cursor: pointer; z-index: 2;
+    box-shadow: 0 2px 7px rgba(0,0,0,.28);
+    transition: background .15s ease, transform .12s ease;
+}
+/* El dibujo del micrófono (SVG) — igual en celular, tablet y PC. Nunca un emoji:
+   el emoji lo pinta el aparato y en Windows salía gris apagado sobre el naranja. */
+.btn-voz svg { display: block; width: 22px; height: 22px; }
+/* La barra superior tiene su propia regla para sus botones: esta la gana. */
+.topbar__search .btn-voz { background: var(--marca-naranja, #ea6a12); color: #fff; padding: 0; }
+.btn-voz:hover { background: var(--marca-naranja-osc, #c8550a); }
+.btn-voz:active { transform: translateY(-50%) scale(.92); }
+.btn-voz:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.btn-voz__icono { display: block; pointer-events: none; }
+
+/* Escuchando: late en rojo para que se vea de un vistazo (se usa caminando, en la calle) */
+.btn-voz.is-escuchando { background: #c1121f; animation: voz-latido 1.1s ease-in-out infinite; }
+@keyframes voz-latido {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(193,18,31,.65); }
+    50%      { box-shadow: 0 0 0 7px rgba(193,18,31,0); }
+}
+@media (prefers-reduced-motion: reduce) { .btn-voz.is-escuchando { animation: none; } }
+
+/* El campo mientras se dicta */
+input.voz-escuchando::placeholder { color: var(--color-error, #dc2626); font-weight: 700; }
+.topbar__search input.voz-escuchando::placeholder { color: var(--marca-granate); }
+
+/* Aviso del micrófono: permiso denegado, "no te escuché", sin conexión… */
+.voz-aviso {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 320;
+    display: none; text-align: left;
+    background: #fff; color: var(--color-texto);
+    border-left: 4px solid var(--marca-naranja, #ea6a12); border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    padding: 10px 12px; font-size: 14px; line-height: 1.35;
+}
+.voz-aviso--visible { display: block; }
+.voz-aviso--error { border-left-color: var(--color-error, #dc2626); }
+/* Mientras hay aviso, el desplegable fuzzy no debe taparlo */
+.pred-wrap.voz-con-aviso .dropdown-fuzzy { display: none !important; }
+
+/* ====== ESCRITORIO: LA CABECERA EN UNA SOLA FILA (logo · buscador · ☰ Menú) ======
+   Orden del jefe (2026-09-20): *«reduce el ancho del buscador en el modo PC… debe verse el menú
+   hamburguesa y debe verse el logo al costado, ocupando los tres una sola fila»*.
+   Cómo queda:
+     · La banda de la marca (.marca-banda) NO se pinta en PC: su logo y su ☰ se mudan a esta fila.
+     · El buscador BAJA de 760 px a 560 px y queda centrado entre el logo y el botón.
+     · El ☰ va al extremo derecho y las tres piezas caben en los 1200 px de --max-ancho.
+   ⚠️ EN EL CELULAR NO CAMBIA NADA: sigue la banda arriba (que se va con el scroll) y el buscador
+   abajo, ancho, dentro de la cabecera fija. Por eso el corte está en 900 px: por debajo de eso el
+   logo (336 px) + el buscador + el ☰ no caben con holgura en una sola fila. */
+@media (min-width: 900px) {
+    .marca-banda { display: none; }
+    .topbar__inner {
+        flex-direction: row;
+        align-items: center;
+        gap: 18px;
+        padding: 10px 14px 6px;
+    }
+    .topbar__logo--pc { display: inline-flex; flex: 0 0 auto; }
+    /* El logo es muy apaisado (593 × 67): a 38 px de alto mide 336 px de ancho */
+    .topbar__logo--pc .topbar__logo-img { height: 38px; width: auto; }
+    .topbar__burger--pc { display: inline-flex; flex: 0 0 auto; }
+    /* flex + `margin: 0 auto`: el buscador se queda centrado entre el logo y el ☰ */
+    .topbar__search { flex: 1 1 auto; max-width: 560px; }
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 640px) {
+    .topbar__inner { gap: 6px; padding: 7px 12px 2px; }
+    .marca-banda .topbar__barra { padding: 8px 12px; }
+    /* En celular el logo se mide por ANCHO: al costado va el botón ☰ y en un teléfono de
+       320 px tienen que entrar los dos. 56vw deja aire suficiente para el botón "Menú".
+       La primera línea es el respaldo para navegadores viejos que no entienden min(). */
+    .topbar__logo-img { height: auto; width: 56vw; width: min(56vw, 300px); }
+    .topbar__burger { padding: 9px 13px; }
+    .topbar__burger-txt { font-size: 13px; }
+    .topbar__search { padding: 4px 5px 4px 16px; }
+    .topbar__search input { padding: 11px 0; }
+    .hero__titulo { font-size: 22px; }
+    .grid-negocios { grid-template-columns: 1fr; }
+    .seccion__titulo { font-size: 18px; }
+    /* El micrófono no se achica: se toca con el dedo, muchas veces en la calle */
+    .btn-voz { width: 38px; height: 38px; min-width: 38px; }
+    .pred-wrap--voz input,
+    .topbar__search .pred-wrap--voz input { padding-right: 50px; }
+}
+
+/* ==========================================================================
+   ZOOM DE GALERÍA — la foto se ve pequeña y se amplía al tocarla
+   Motor: assets/js/imagen_zoom.js · Se activa con la clase .cz-zoom
+   (o con el atributo data-full) en el <img>.
+   ES UNA GALERÍA (arreglo del 2026-09-14): al abrir una foto se abre toda la
+   galería del negocio y se pasa de una a otra deslizando ← →, con los botones
+   ‹ › o con las flechas del teclado. Arriba a la izquierda va el contador
+   «3 / 8». Pensado para MÓVIL: ✕ grande, cierre tocando el fondo, con Esc o
+   deslizando ↓, y se permite el pellizco para acercar.
+   ========================================================================== */
+.cz-zoom { cursor: zoom-in; }
+
+body.cz-zoom-abierto { overflow: hidden; }
+
+.cz-zoom-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 10, 12, .96);
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+}
+.cz-zoom-overlay--visible { display: flex; }
+
+.cz-zoom-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    opacity: 0;
+    /* la opacidad y el desplazamiento: al pasar de foto una se va y la otra entra */
+    transition: opacity .18s ease, transform .18s ease;
+    touch-action: pinch-zoom;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+.cz-zoom-img--lista { opacity: 1; }
+
+/* 🔢 EL CONTADOR «3 / 8» (arriba a la izquierda): dice por dónde vas */
+.cz-zoom-contador {
+    position: absolute;
+    top: calc(14px + env(safe-area-inset-top));
+    left: calc(16px + env(safe-area-inset-left));
+    display: none;
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .5);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    z-index: 2;
+}
+.cz-zoom-overlay--multiple .cz-zoom-contador { display: block; }
+
+/* ‹ › PASAR DE FOTO: se pintan SOLO si la galería tiene más de una foto */
+.cz-zoom-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .92);
+    color: #171717;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+}
+.cz-zoom-overlay--multiple .cz-zoom-nav { display: flex; }
+.cz-zoom-nav--ant { left: calc(8px + env(safe-area-inset-left)); }
+.cz-zoom-nav--sig { right: calc(8px + env(safe-area-inset-right)); }
+.cz-zoom-nav:active { background: #fff; }
+
+.cz-zoom-cerrar {
+    position: absolute;
+    top: calc(10px + env(safe-area-inset-top));
+    right: calc(12px + env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .94);
+    color: #171717;
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.cz-zoom-cargando {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: .85;
+}
+
+.cz-zoom-pista {
+    position: absolute;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, .72);
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   MENÚ PRINCIPAL (hamburguesa) — 2026-09-10, pedido del jefe
+   Lo pinta includes/header.php y lo abre/cierra el script de ese mismo archivo.
+   Reemplaza a los botones con iconos de la barra (en móvil no cabían).
+   Sirve igual para el visitante sin cuenta y para el usuario logueado.
+
+   📏 COMPACTO (orden del jefe, 2026-09-21): *«lo vas a hacer un poco más compacto»*.
+   Al entrar la sección «Nosotros» (tres opciones más) el panel se hacía muy largo, así que
+   se apretó el ritmo vertical SIN quitar nada: se recortaron los rellenos y los márgenes
+   (cabecera 13/15 → 10/12 px, renglón 11/12 → 8/10 px, grupo 16/6 → 11/3 px), el logo del
+   panel (250 → 205 px), la ✕ (38 → 34 px) y los chips de rubro (13 → 12 px). Los TÍTULOS se
+   quedan en 15,5 px (16 px en celular) y las descripciones en 11,5 px: lo que se aprieta es el
+   aire, no la letra. Si hay que apretarlo más, se sigue por los rellenos, nunca por la fuente.
+   ========================================================================== */
+.menu-principal { position: fixed; inset: 0; z-index: 1200; }
+
+.menu-principal__fondo {
+    position: absolute; inset: 0;
+    background: rgba(28, 3, 10, .58);
+    backdrop-filter: blur(2px);
+    animation: menuFondo .18s ease-out;
+}
+
+/* Panel FLOTANTE: no llega a los bordes (deja ver la página detrás, efecto 3D) y ocupa como
+   mucho el 80 % del ancho en celular / 480 px en escritorio. Pedido del jefe 2026-09-10. */
+.menu-principal__caja {
+    position: absolute; top: 10px; right: 10px; bottom: 10px;
+    width: min(80vw, 480px);
+    background: #fff;
+    display: flex; flex-direction: column;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: -16px 0 46px rgba(0,0,0,.45), 0 12px 30px rgba(0,0,0,.3);
+    animation: menuEntra .24s ease-out;
+}
+
+@keyframes menuFondo { from { opacity: 0 } to { opacity: 1 } }
+@keyframes menuEntra { from { transform: translateX(26px); opacity: .35 } to { transform: none; opacity: 1 } }
+@media (prefers-reduced-motion: reduce) {
+    .menu-principal__fondo, .menu-principal__caja { animation: none; }
+}
+
+.menu-principal__head {
+    flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, var(--marca-granate) 0%, var(--marca-granate-osc) 100%);
+    color: #fff;
+}
+
+.menu-principal__marca {
+    display: inline-flex; align-items: center;
+    color: #fff; text-decoration: none;
+}
+/* En el cajón del menú manda el ANCHO: a la derecha va la ✕ y en celular el cajón mide 80vw.
+   La primera línea es el respaldo para navegadores viejos que no entienden min(). */
+.menu-principal__marca-img { display: block; width: 40vw; width: min(40vw, 205px); height: auto; }
+
+.menu-principal__x {
+    width: 34px; height: 34px; min-width: 34px;
+    border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
+    background: rgba(255,255,255,.14); color: #fff;
+    font-size: 15px; line-height: 1; cursor: pointer;
+}
+.menu-principal__x:hover { background: rgba(255,255,255,.26); }
+
+.menu-principal__cuerpo {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 10px 12px;
+}
+
+.menu-principal__grupo {
+    margin: 11px 0 3px;
+    font-size: 11px; font-weight: 800; letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--marca-granate); opacity: .82;
+}
+
+.menu-principal__item {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 8px 10px; border-radius: 10px;
+    border: 1px solid transparent;
+    text-decoration: none; color: var(--color-texto);
+}
+.menu-principal__item:hover { background: #fdf3ee; border-color: #f0dcd2; }
+.menu-principal__item--destacado { background: #fff4e6; border-color: #f2d1a8; }
+.menu-principal__item--destacado:hover { background: #ffedd8; }
+
+.menu-principal__ico { flex: 0 0 auto; font-size: 17px; line-height: 1.3; }
+.menu-principal__txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.menu-principal__t { font-size: 15.5px; font-weight: 700; line-height: 1.25; }
+.menu-principal__s { font-size: 11.5px; line-height: 1.3; color: var(--color-texto-claro, #6b6b6b); }
+
+.menu-principal__rubros { display: flex; flex-wrap: wrap; gap: 5px; padding: 3px 0 1px; }
+.menu-principal__rubros a {
+    font-size: 12px; font-weight: 600; text-decoration: none;
+    color: var(--marca-granate);
+    background: #f8ece7; border: 1px solid #ecd9cf;
+    border-radius: 999px; padding: 5px 9px;
+}
+.menu-principal__rubros a:hover { background: var(--marca-crema); }
+
+.menu-principal__pie {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    font-size: 11px; color: #7a7a7a;
+    background: #faf7f4; border-top: 1px solid #eee;
+}
+
+/* El botón "Negocios cerca de mí" (módulo includes/btn_cerca.php) entra en el menú
+   como una opción más: verde, ancho completo y con su propio aviso de ubicación. */
+.menu-principal .btc-cerca { margin: 0; max-width: none; }
+.menu-principal .btc-cerca__btn { border-radius: 10px; padding: 10px 12px; }
+.menu-principal .btc-cerca__t { font-size: 15px; }
+.menu-principal .btc-cerca__s { font-size: 11.5px; }
+.menu-principal .btc-cerca__estado { font-size: 12.5px; margin-top: 6px; }
+
+@media (max-width: 640px) {
+    .menu-principal__caja { width: 80vw; top: 8px; right: 8px; bottom: 8px; }
+    /* En celular el título se queda en 16 px (manda la legibilidad): lo compacto es el aire. */
+    .menu-principal__t { font-size: 16px; }
+}
+
+/* ===================================================================
+   ✍️ COPY ENRIQUECIDO DE LA FICHA — clases .cz-* (opt-in)
+   -------------------------------------------------------------------
+   Para qué sirve: que la descripción de una ficha ("Sobre nosotros") se
+   pueda escribir como una publicación PRESENTABLE: títulos de sección con
+   color, listas con viñeta de color y llamadas a la acción destacadas.
+
+   Cómo se usa (dentro de la descripción del negocio):
+
+       <h3 class="cz-tit">🍽️ Título de la ficha</h3>
+       <p>Texto…</p>
+       <h3 class="cz-sub">📋 Título de sección (salto de pantalla)</h3>
+       <ul class="cz-lista"><li>punto uno</li><li>punto dos</li></ul>
+       <p class="cz-cta">👉 Llamada a la acción normal</p>
+       <p class="cz-cta-final">🎉 Llamada a la acción de cierre</p>
+
+   Tres cosas importantes:
+   1) El color NO va en el HTML: sale de la PALETA del dueño (--color-primario
+      / --color-acento, que base.css define por `body[data-color]`). Por eso la
+      misma clase se ve roja en un restaurante, verde en un colegio o azul en
+      una iglesia, sin tocar una línea de CSS.
+   2) Es OPT-IN: solo cambia lo que lleve la clase. Las fichas que no la usan
+      se ven exactamente igual que antes (ninguna de las ~1 500 se altera).
+   3) Las etiquetas permitidas en la descripción son h3 p strong b em i ul ol
+      li br (limpiar_html_descripcion(), includes/helpers.php). Los ATRIBUTOS
+      —como class— sí se conservan; <span> o <div> NO se permiten, así que el
+      diseño se resuelve aquí y no en el HTML del negocio.
+   =================================================================== */
+
+.ficha-A__descripcion-contenido .cz-tit,
+.ficha-B__descripcion-contenido .cz-tit,
+.ficha-C__info-bloque-contenido .cz-tit {
+    display: block;
+    background: linear-gradient(100deg, var(--color-primario) 0%, var(--color-acento) 100%);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+    margin: 18px 0 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
+}
+.ficha-A__descripcion-contenido .cz-tit:first-child,
+.ficha-B__descripcion-contenido .cz-tit:first-child,
+.ficha-C__info-bloque-contenido .cz-tit:first-child { margin-top: 0; }
+
+/* Subtítulo de sección: el "salto de pantalla" del copy. Barra de color a la
+   izquierda + texto en el color de la paleta, para separar bloques de
+   información sin repetir el degradado del título. */
+.ficha-A__descripcion-contenido .cz-sub,
+.ficha-B__descripcion-contenido .cz-sub,
+.ficha-C__info-bloque-contenido .cz-sub {
+    display: block;
+    margin: 16px 0 8px;
+    padding: 7px 11px;
+    border-left: 4px solid var(--color-acento);
+    border-radius: 0 8px 8px 0;
+    background: var(--color-fondo-app);
+    color: var(--color-primario);
+    font-size: 14.5px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.ficha-A__descripcion-contenido .cz-lista,
+.ficha-B__descripcion-contenido .cz-lista,
+.ficha-C__info-bloque-contenido .cz-lista {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+}
+.ficha-A__descripcion-contenido .cz-lista li,
+.ficha-B__descripcion-contenido .cz-lista li,
+.ficha-C__info-bloque-contenido .cz-lista li {
+    position: relative;
+    padding: 6px 0 6px 20px;
+    line-height: 1.55;
+    border-bottom: 1px dashed var(--color-borde);
+}
+.ficha-A__descripcion-contenido .cz-lista li:last-child,
+.ficha-B__descripcion-contenido .cz-lista li:last-child,
+.ficha-C__info-bloque-contenido .cz-lista li:last-child { border-bottom: 0; }
+.ficha-A__descripcion-contenido .cz-lista li::before,
+.ficha-B__descripcion-contenido .cz-lista li::before,
+.ficha-C__info-bloque-contenido .cz-lista li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 13px;
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+    background: var(--color-acento);
+}
+
+.ficha-A__descripcion-contenido .cz-cta,
+.ficha-B__descripcion-contenido .cz-cta,
+.ficha-C__info-bloque-contenido .cz-cta {
+    margin: 0 0 10px;
+    padding: 11px 13px;
+    border-left: 4px solid var(--color-primario);
+    border-radius: 0 10px 10px 0;
+    background: var(--color-fondo-app);
+    font-size: 14px;
+    line-height: 1.55;
+}
+.ficha-A__descripcion-contenido .cz-cta-final,
+.ficha-B__descripcion-contenido .cz-cta-final,
+.ficha-C__info-bloque-contenido .cz-cta-final {
+    margin: 16px 0 4px;
+    padding: 13px 14px;
+    border-radius: 12px;
+    background: linear-gradient(100deg, var(--color-primario) 0%, var(--color-acento) 100%);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+.ficha-A__descripcion-contenido .cz-cta-final strong,
+.ficha-B__descripcion-contenido .cz-cta-final strong,
+.ficha-C__info-bloque-contenido .cz-cta-final strong { color: #fff; }
+
+/* ===================================================================
+   COLORES Y BOTONES DEL COPY DE LA TIENDA (2026-09-14 — pedido del jefe:
+   «procura usar colores y varios botones dentro del copyright con enlaces
+   para que puedan dar clic y puedan ir al WhatsApp de la persona»)
+   -------------------------------------------------------------------
+   La descripción solo admite h3 p strong b em i ul ol li br, así que el
+   color y los botones se resuelven con CLASES dentro de esas etiquetas:
+     · <p class="cz-precio">S/ 80 a S/ 140</p>   → precio grande, destacado
+     · <strong class="cz-ok">sin dolor</strong>  → verde (beneficio)
+     · <strong class="cz-alerta">urgencia</strong> → rojo (aviso)
+     · <p class="cz-caja">…</p>                  → recuadro de acento
+     · <p class="cz-nota">…</p>                  → letra chica de aclaración
+     · <p class="cz-btn cz-wa" data-msg="…">📲 Pedir mi cita</p>
+                                       → PHP lo convierte en <a> de WhatsApp
+                                         (descripcion_negocio_html(), helpers.php)
+     · <p class="cz-btn cz-tel">📞 Llamar</p>    → <a> de llamada (tel:)
+   Reglas del sitio: móvil primero, texto ≥16 px y botón táctil ≥44 px.
+   =================================================================== */
+.ficha-A__descripcion-contenido .cz-precio,
+.ficha-B__descripcion-contenido .cz-precio,
+.ficha-C__info-bloque-contenido .cz-precio {
+    display: block;
+    margin: 12px 0 8px;
+    padding: 10px 13px;
+    border: 1px dashed var(--color-acento);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--color-primario);
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.3;
+    text-align: center;
+}
+.ficha-A__descripcion-contenido .cz-ok,
+.ficha-B__descripcion-contenido .cz-ok,
+.ficha-C__info-bloque-contenido .cz-ok { color: #15803d; font-weight: 800; }
+
+.ficha-A__descripcion-contenido .cz-alerta,
+.ficha-B__descripcion-contenido .cz-alerta,
+.ficha-C__info-bloque-contenido .cz-alerta { color: #b91c1c; font-weight: 800; }
+
+.ficha-A__descripcion-contenido .cz-caja,
+.ficha-B__descripcion-contenido .cz-caja,
+.ficha-C__info-bloque-contenido .cz-caja {
+    margin: 12px 0;
+    padding: 11px 13px;
+    border-left: 4px solid var(--color-acento);
+    border-radius: 0 10px 10px 0;
+    background: var(--color-fondo-app);
+    line-height: 1.55;
+}
+.ficha-A__descripcion-contenido .cz-nota,
+.ficha-B__descripcion-contenido .cz-nota,
+.ficha-C__info-bloque-contenido .cz-nota {
+    margin: 8px 0;
+    color: var(--color-texto-claro);
+    font-size: 13.5px;
+    line-height: 1.5;
+}
+
+/* Botones del copy: ancho cómodo en el celular, verdes para WhatsApp y con el hueco
+   (gap) del ícono oficial que mete wa_icono_svg(). */
+.ficha-A__descripcion-contenido a.cz-btn,
+.ficha-B__descripcion-contenido a.cz-btn,
+.ficha-C__info-bloque-contenido a.cz-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 440px;
+    min-height: 48px;
+    margin: 12px auto;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
+    font-size: 16.5px;
+    font-weight: 800;
+    line-height: 1.15;
+    text-align: center;
+    text-decoration: none;
+}
+.ficha-A__descripcion-contenido a.cz-btn svg,
+.ficha-B__descripcion-contenido a.cz-btn svg,
+.ficha-C__info-bloque-contenido a.cz-btn svg { flex: 0 0 auto; }
+
+.ficha-A__descripcion-contenido a.cz-btn--wa,
+.ficha-B__descripcion-contenido a.cz-btn--wa,
+.ficha-C__info-bloque-contenido a.cz-btn--wa { background: var(--color-wsp); color: #fff; }
+.ficha-A__descripcion-contenido a.cz-btn--wa:hover,
+.ficha-B__descripcion-contenido a.cz-btn--wa:hover,
+.ficha-C__info-bloque-contenido a.cz-btn--wa:hover { background: #1eb257; }
+
+.ficha-A__descripcion-contenido a.cz-btn--tel,
+.ficha-B__descripcion-contenido a.cz-btn--tel,
+.ficha-C__info-bloque-contenido a.cz-btn--tel { background: var(--color-primario); color: #fff; }
+
+.ficha-A__descripcion-contenido a.cz-btn:active,
+.ficha-B__descripcion-contenido a.cz-btn:active,
+.ficha-C__info-bloque-contenido a.cz-btn:active { transform: translateY(1px); }
+
+/* ===================================================================
+   EMPLEOS Y ANUNCIOS (módulo nuevo, 2026-09-12 · contrato aprobado)
+   -------------------------------------------------------------------
+   Reglas de este módulo, tal como las aprobó el jefe:
+     1) El aviso de empleo es SOLO TEXTO: nada de fotos ni de capturas.
+     2) Móvil primero: el texto principal nunca baja de 16 px y todo
+        botón táctil mide 44 px de alto como mínimo.
+     3) Se reutilizan los tokens de base.css (--marca-*, --color-*,
+        --radio-borde, --sombra-tarjeta, --color-wsp) y las mismas
+        fórmulas de tarjeta que .card-producto / .card-negocio.
+     4) Los tres tipos (ofrezco · busco · anuncio) se pintan con un
+        color sobrio por tarjeta: fondo tenue + texto oscuro, la misma
+        receta de .flash--info/--exito/--warning (líneas 283-286).
+   =================================================================== */
+
+/* ====== REJILLA DE EMPLEOS (2 columnas → 4 desde 900 px) ======
+   El gap es el mismo de .grid-negocios (14px, línea 292) para que el bloque del index no
+   desentone con las demás filas de tarjetas de la portada. */
+.grid-empleos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));   /* celular: 2 columnas */
+    gap: 14px;
+}
+@media (min-width: 900px) {
+    .grid-empleos { grid-template-columns: repeat(4, minmax(0, 1fr)); }   /* escritorio: 4 columnas */
+}
+
+/* Recorte del BLOQUE DEL INDEX sin JavaScript (pedido expreso del jefe: 8 en celular, 16 en PC):
+   index.php pinta SIEMPRE las 16 tarjetas —así Google las indexa todas— y aquí se ocultan de la
+   9.ª en adelante. En celular la rejilla es de 2 columnas → 8 visibles (2 × 4); desde 900 px es de
+   4 columnas → las 16 visibles (4 × 4). Las tarjetas ocultas siguen en el HTML. */
+@media (max-width:899px) {
+    .grid-empleos > *:nth-child(n+9) { display: none; }
+    /* ⚠️ Excepción de la PÁGINA /empleos: ahí el recorte NO sirve (se perderían los avisos 9 a 24 de
+       cada página y la paginación no tendría sentido). Esa página lleva las dos clases juntas
+       .grid-empleos.grid-empleos--completa y así se ven todos sus avisos. */
+    .grid-empleos.grid-empleos--completa > *:nth-child(n+9) { display: block; }
+}
+
+/* ====== TARJETA DEL AVISO (texto, sin imagen) ====== */
+.card-empleo {
+    --empleo-pad: 10px;                 /* margen interno lateral (se aprieta en celular) */
+    display: flex;
+    flex-direction: column;
+    background: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-top: 4px solid var(--empleo-color, var(--color-borde));   /* franja superior del tipo */
+    border-radius: 12px;                /* el mismo radio de .card-producto (línea 395) */
+    box-shadow: var(--sombra-tarjeta);
+    overflow: hidden;                   /* recorta la franja contra el radio */
+    color: var(--color-texto);
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
+}
+.card-empleo:hover { transform: translateY(-2px); box-shadow: var(--sombra-hover); }
+
+/* 🖼️ LA FOTO DE PORTADA DE LA TARJETA (2026-09-17, orden del jefe: «mantén la imagen en el
+   anuncio»): SOLO la llevan los avisos que traen AFICHE (clase .card-empleo--afiche). Se enseña
+   recortada a 16:10 y ANCLADA ARRIBA, que es donde el cartel pone el nombre del negocio y el
+   titular («ESTAMOS BUSCANDO…»); el cartel completo se ve en la ficha del aviso. Las tarjetas sin
+   afiche no cambian absolutamente nada: siguen siendo de solo texto. */
+.card-empleo__foto { position: relative; aspect-ratio: 16 / 10; background: #f4f4f5; overflow: hidden; }
+.card-empleo__foto img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+/* Color por tipo: variables en la tarjeta (--empleo-color se hereda a la franja, al chip y al
+   sueldo). Sobrios y del sitio: verde de .flash--exito, azul noche --marca-link y marrón
+   --marca-marron; la ficha del aviso usa los mismos valores con su propio sufijo --tipo. */
+.card-empleo--ofrezco, .empleo-ficha--ofrezco { --empleo-color: #15803d; --empleo-fondo: #f0fdf4; --empleo-borde: #bbf7d0; }
+.card-empleo--busco,   .empleo-ficha--busco   { --empleo-color: #123c6b; --empleo-fondo: #eff6ff; --empleo-borde: #bfdbfe; }
+.card-empleo--anuncio, .empleo-ficha--anuncio { --empleo-color: var(--marca-marron); --empleo-fondo: var(--marca-crema); --empleo-borde: #e7d5bb; }
+
+/* Tira superior: etiqueta del tipo a la izquierda y "hace 2 días" a la derecha.
+   Lleva flex-wrap para que en la tarjeta estrecha de celular la fecha baje a una segunda línea. */
+.card-empleo__franja {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 6px var(--empleo-pad);
+    background: var(--empleo-fondo, #f4f4f5);
+    border-bottom: 1px solid var(--empleo-borde, var(--color-borde));
+}
+.card-empleo__tipo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--empleo-borde, var(--color-borde));
+    color: var(--empleo-color, var(--color-texto));
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.card-empleo__cuando {
+    margin-left: auto;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--color-texto-claro);
+    white-space: nowrap;
+}
+
+/* El puesto: negrita y como MUCHO dos líneas (misma receta de line-clamp que
+   .card-producto__titulo, líneas 420-421). */
+.card-empleo__titulo {
+    padding: 9px var(--empleo-pad) 0;
+    font-size: 16px;                    /* texto principal: nunca por debajo de 16 px */
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--color-texto);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.card-empleo__entidad {
+    padding: 3px var(--empleo-pad) 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-texto-claro);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.card-empleo__zona {
+    padding: 3px var(--empleo-pad) 0;
+    font-size: 12.5px;
+    line-height: 1.55;                  /* deja respirar el chip cuando la línea se parte */
+    color: var(--color-texto-claro);
+}
+.card-empleo__texto {
+    padding: 6px var(--empleo-pad) 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--color-texto-claro);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;              /* dos líneas máximo, igual que el titular */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+/* Chip del oficio (🧱 Construcción): va DENTRO de la línea de la zona —después del "·"—, tal
+   como lo pinta empleo_card_html() (helpers.php:2481-2483): por eso es un inline-block y no un
+   bloque con márgenes propios. */
+.card-empleo__chip {
+    display: inline-block;
+    max-width: 100%;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--empleo-fondo, #f4f4f5);
+    border: 1px solid var(--empleo-borde, var(--color-borde));
+    color: var(--empleo-color, var(--color-texto-claro));
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Pie: sueldo destacado a la izquierda y botón de WhatsApp a la derecha. Ocupa siempre el fondo
+   de la tarjeta (margin-top:auto, como .card-negocio__meta) y se separa con la línea de puntos
+   que ya usa el sitio (.cz-lista li, línea 1047). */
+.card-empleo__pie {
+    margin-top: auto;
+    padding: 9px var(--empleo-pad) 10px;
+    border-top: 1px dashed var(--color-borde);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.card-empleo__sueldo {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-primario);       /* el destacado en granate, como .card-producto__precio */
+}
+/* Botón de WhatsApp: verde del sitio (--color-wsp), nunca menos de 44 px de alto y con hueco
+   (gap) para el SVG del ícono que mete wa_icono_svg(). */
+.card-empleo__wa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: var(--color-wsp);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.card-empleo__wa:hover { background: #1eb257; }
+.card-empleo__wa:active { transform: translateY(1px); }
+.card-empleo__wa svg { flex: 0 0 auto; }        /* el ícono no se encoge nunca */
+
+/* CELULAR: la tarjeta mide la mitad del ancho, así que el botón de WhatsApp pasa a su propia
+   fila (ancho completo) y se aprieta un poco el margen interno, como .grid-negocios--dos.
+   La franja se pone en columna porque las etiquetas del tipo son largas ("💼 Ofrezco trabajo",
+   "🙋 Busco trabajo", "📌 Anuncio") y así el chip dispone de todo el ancho de la tarjeta. */
+@media (max-width:899px) {
+    .card-empleo__franja { flex-direction: column; align-items: flex-start; gap: 3px; }
+    .card-empleo__tipo { font-size: 10px; letter-spacing: 0; }
+    .card-empleo__cuando { margin-left: 0; }
+    .card-empleo__pie { flex-direction: column; align-items: stretch; gap: 7px; }
+    .card-empleo__wa { width: 100%; }
+}
+@media (max-width:640px) {
+    .card-empleo { --empleo-pad: 8px; }
+    .card-empleo__texto { font-size: 12.5px; }
+}
+
+/* ====== BARRA DE FILTROS DE EMPLEOS ====== */
+.empleos-toolbar {
+    background: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-tarjeta);
+    padding: 12px;
+    margin-bottom: 14px;
+}
+.empleos-toolbar__fila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+.empleos-toolbar__fila + .empleos-toolbar__fila { margin-top: 8px; }
+.empleos-toolbar__lbl {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--color-texto-claro);
+    white-space: nowrap;
+}
+/* Buscador y desplegables de empleos: 16 px (en iOS un campo de menos de 16 px hace zoom solo
+   al enfocarlo) y 44 px de alto para el dedo. */
+.empleos-toolbar input[type="search"],
+.empleos-toolbar select {
+    flex: 1 1 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 9px 11px;
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--color-texto);
+    font-size: 16px;
+}
+.empleos-toolbar input[type="search"]:focus,
+.empleos-toolbar select:focus {
+    outline: none;
+    border-color: var(--color-acento);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+/* Los chips de filtro REUTILIZAN .filtro-chip (vive en buscar.php:395-408, no está en este
+   archivo): aquí NO se redefine su aspecto, solo se le da la altura táctil de 44 px que pide el
+   proyecto y una fila que se desliza de lado —como .carrusel-productos— cuando hay muchos oficios.
+   Desde 900 px sobra sitio y los chips pasan a varias filas. */
+.empleos-toolbar__chips {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 2px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.empleos-toolbar__chips::-webkit-scrollbar { display: none; }
+.empleos-toolbar .filtro-chip > span { min-height: 44px; }
+@media (min-width: 900px) {
+    .empleos-toolbar__chips { flex-wrap: wrap; overflow-x: visible; }
+}
+
+/* Contador "42 avisos activos" */
+.empleos-count {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0 0 12px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--color-texto-claro);
+}
+.empleos-count b,
+.empleos-count strong { font-size: 15px; color: var(--color-primario); }
+
+/* ====== PAGINADOR (el sitio no tenía: se estrena aquí) ======
+   Números de página en una fila centrada; cada botón mide 44 × 44 px como mínimo para que se
+   pueda tocar con el dedo. */
+.paginador {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 18px 0 6px;
+}
+.paginador__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1.5px solid var(--color-borde);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--color-primario);
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.paginador__btn:hover { background: var(--marca-crema); }
+/* Página actual (y "siguiente/anterior" sin destino): se queda encendida en granate. */
+.paginador__btn--activo,
+.paginador__btn--activo:hover {
+    background: var(--color-primario);
+    border-color: var(--color-primario);
+    color: #fff;
+}
+.paginador__btn--off { opacity: .45; pointer-events: none; }
+.paginador__puntos { min-width: 22px; text-align: center; font-weight: 700; color: var(--color-texto-claro); }
+.paginador__info { flex: 1 1 100%; margin-top: 4px; text-align: center; font-size: 12.5px; color: var(--color-texto-claro); }
+
+/* ====== FICHA DEL AVISO (/empleo/<slug>) ======
+   El tipo se marca con las clases .empleo-ficha--ofrezco / --busco / --anuncio, que comparten
+   los mismos colores que las tarjetas de empleo. */
+.empleo-ficha {
+    background: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-top: 5px solid var(--empleo-color, var(--color-borde));
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-tarjeta);
+    padding: 16px 14px 18px;
+    margin-bottom: 18px;
+    color: var(--color-texto);
+}
+.empleo-ficha__cab {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+}
+.empleo-ficha__tipo {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--empleo-fondo, #f4f4f5);
+    border: 1px solid var(--empleo-borde, var(--color-borde));
+    color: var(--empleo-color, var(--color-texto));
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+}
+.empleo-ficha__cuando {
+    margin-left: auto;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-texto-claro);
+}
+.empleo-ficha__titulo {
+    font-size: 24px;                    /* título grande: es el h1 de la página */
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-texto);
+    margin-bottom: 6px;
+}
+.empleo-ficha__entidad { font-size: 15px; font-weight: 700; color: var(--marca-granate); margin-bottom: 3px; }
+.empleo-ficha__meta { font-size: 14px; color: var(--color-texto-claro); margin-bottom: 12px; }
+
+/* Caja del sueldo: lo primero que mira quien busca trabajo. Ojo: NUNCA se inventa el sueldo
+   (si el aviso no lo dice, va "A convenir"); el CSS solo lo destaca. */
+.empleo-ficha__sueldo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    border: 1px solid var(--empleo-borde, var(--color-borde));
+    border-radius: 10px;
+    background: var(--empleo-fondo, var(--marca-crema));
+}
+.empleo-ficha__sueldo-t {
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--color-texto-claro);
+}
+.empleo-ficha__sueldo-v,
+.empleo-ficha__sueldo b,
+.empleo-ficha__sueldo strong {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--empleo-color, var(--color-primario));
+}
+
+/* 🖼️ EL AFICHE DEL AVISO EN LA FICHA (2026-09-17): el cartel COMPLETO, sin recortar y centrado
+   (se abre en grande al tocarlo). El marco usa los colores del tipo de aviso, igual que la caja
+   del sueldo. En celular ocupa el ancho entero; en escritorio se queda en su tamaño natural. */
+.empleo-ficha__afiche {
+    margin: 0 0 14px;
+    padding: 10px;
+    border: 1px solid var(--empleo-borde, var(--color-borde));
+    border-radius: 12px;
+    background: var(--empleo-fondo, #f7f7f8);
+    text-align: center;
+}
+.empleo-ficha__afiche a { display: block; }
+.empleo-ficha__afiche img {
+    display: block;
+    width: 100%;
+    max-width: 512px;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: var(--sombra-tarjeta);
+}
+.empleo-ficha__afiche figcaption {
+    margin-top: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--color-texto-claro);
+}
+
+/* Filas de datos (entidad, zona, jornada, duración, requisitos, teléfono). */
+.empleo-ficha__datos { margin: 0 0 14px; }
+.empleo-ficha__fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--color-borde);
+    font-size: 15px;
+}
+.empleo-ficha__fila:last-child { border-bottom: 0; }
+.empleo-ficha__etiqueta {
+    flex: 0 0 118px;
+    padding-top: 2px;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--color-texto-claro);
+}
+.empleo-ficha__valor { flex: 1 1 160px; min-width: 0; font-weight: 600; color: var(--color-texto); }
+@media (max-width:560px) {
+    .empleo-ficha__etiqueta { flex: 0 0 100%; }   /* en celular la etiqueta va arriba del dato */
+}
+
+/* Descripción del aviso: es texto de usuario (se limpia en PHP con e()/limpiar_html). */
+.empleo-ficha__texto { font-size: 16px; line-height: 1.55; color: var(--color-texto); margin-bottom: 14px; }
+.empleo-ficha__texto p { margin-bottom: 10px; }
+.empleo-ficha__texto h3 { margin: 14px 0 6px; font-size: 17px; font-weight: 800; color: var(--marca-granate); }
+.empleo-ficha__texto ul { margin: 0 0 10px; padding-left: 20px; list-style: disc; }  /* base.css quita los puntos */
+.empleo-ficha__texto li { margin-bottom: 4px; }
+
+/* Aviso de seguridad: la misma receta de .flash--warning (línea 286). Nunca pagar por un trabajo. */
+.empleo-ficha__seguridad {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border-left: 4px solid var(--color-warning);
+    border-radius: 8px;
+    background: #fffbeb;
+    color: #b45309;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+/* Botón grande de WhatsApp + reportar el aviso. */
+.empleo-ficha__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.empleo-ficha__wa {
+    flex: 1 1 220px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 13px 18px;
+    border-radius: 12px;
+    background: var(--color-wsp);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+    text-decoration: none;
+}
+.empleo-ficha__wa:hover { background: #1eb257; }
+.empleo-ficha__wa svg { flex: 0 0 auto; }
+.empleo-ficha__reportar {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-texto-claro);
+    text-decoration: underline;
+}
+.empleo-ficha__reportar:hover { color: var(--color-error); }
+
+/* ====== FORMULARIO PÚBLICO DE PUBLICACIÓN ======
+   Aquí SOLO vive la rejilla propia del formulario: los campos llevan las clases que ya usa todo
+   el sitio (.form__input · .form__label · .form__select · .form__textarea, líneas 576-607) y no
+   se tocan. En celular una columna; desde 900 px, dos. */
+.empleo-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+.empleo-form > .form__group { margin-bottom: 0; }   /* el aire lo da el gap, no el margen viejo */
+.empleo-form__ancho { grid-column: 1 / -1; }        /* campos que van a todo lo ancho (descripción) */
+.empleo-form__ayuda { font-size: 12.5px; line-height: 1.4; color: var(--color-texto-claro); }
+.empleo-form__acciones {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.empleo-form__acciones .btn { min-height: 48px; font-size: 16px; }
+@media (min-width: 900px) {
+    .empleo-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+}
+
+/* ====== EMPLEOS SIN AVISOS ====== */
+.empleo-bloque-vacio {
+    background: var(--color-fondo-tarjeta);
+    border: 1.5px dashed var(--color-borde);
+    border-radius: 14px;
+    box-shadow: var(--sombra-tarjeta);
+    padding: 22px 16px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-texto-claro);
+}
+.empleo-bloque-vacio__ico { display: block; margin-bottom: 8px; font-size: 34px; line-height: 1; }
+.empleo-bloque-vacio__t { margin-bottom: 6px; font-size: 17px; font-weight: 800; color: var(--color-texto); }
+.empleo-bloque-vacio__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--marca-naranja);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.empleo-bloque-vacio__btn:hover { background: var(--marca-naranja-osc); }
+
+/* ====== LÍNEA DE DATOS DE LA TARJETA (jornada · edad · experiencia · formación) ======
+   La pinta `empleo_card_html()` desde el 2026-09-12: son los datos que el asistente de
+   publicación pide con CLICS. Va debajo de la zona, en letra pequeña y tono suave, para que
+   quien busca trabajo sepa de un vistazo si el aviso le encaja sin abrir la ficha. */
+.card-empleo__datos {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: var(--color-texto-claro);
+}

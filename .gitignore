@@ -1,0 +1,13 @@
+# Herramienta de esta copia (no es parte del sitio)
+__sync_backup.py
+
+# Temporales y cosas del sistema
+*.log
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Carpetas temporales del servidor
+deploy/cache/
+deploy/logs/
+__pycache__/
