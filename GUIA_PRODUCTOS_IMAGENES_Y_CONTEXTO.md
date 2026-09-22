@@ -1076,6 +1076,151 @@ rápida y la que manda: **no hay que volver a leer las imágenes para saber qué
   negocio). De esos 6 **solo `C-154` pasó** (su hoja está en español). Esa es la prueba de que la lista de
   retenidos hay que mirarla antes de volver a pedir: **el problema ya estaba detectado y nadie lo cerró.**
 
+### 🆕 CARTA 10 DEL BANCO — 120 IMÁGENES DE FERRETERÍA (2026-09-22, pedido del jefe)
+
+> *«Quiero asignar 120 imágenes más a nuestro banco de imágenes… imagina posibles productos que se podrían
+> crear y qué imágenes necesitarían… centrémonos en el rubro de ferretería: creo que ahí tenemos suficiente
+> para sacar 120 imágenes, en bloques de 20.»* Confirmado en la misma sesión: **120 imágenes · TODAS de
+> Ferreterías y Construcción · códigos C-598 … C-717 · 6 bloques de 20 · formato VERTICAL 3:4**.
+
+* **Qué son**: productos que se venderán **MÁS ADELANTE**, todos del rubro **Ferreterías y Construcción**
+  (118 de catálogo + 2 de servicio: **«Destape de desagüe»** y **«Corte de vidrio a medida»**). Los 6 bloques:
+  **A** fijaciones, clavos, alambres y sujeción · **B** herramientas de mano y eléctricas · **C** plomería y
+  gasfitería · **D** electricidad e iluminación · **E** pintura, químicos y acabados · **F** puertas, chapas,
+  seguridad, obra gruesa y los 2 servicios.
+* **Archivos**: cartas **`CARTA_IA_PRODUCTOS_BANCO10_{A..F}_20.md`** · cuerpos para el chat
+  **`__b10_{a..f}_cuerpo.txt`** (~19 KB cada uno: se pegan en Flow tal cual) · el registro de los 120 grupos
+  **`__b10_grupos.json`** (es lo que se agrega a `__rzc_grupos.json` cuando lleguen las imágenes) · generador
+  **`__b10_gen.py`** (la constante `FORMATO` decide 3:4 o 1:1; los nombres están en `ITEMS`).
+* ⏳ **Estado: PEDIDAS, esperando imágenes.** Cuando el jefe deje el lote en Descargas: manifiesto
+  `archivo = C-xxx` → `python __bn_manifiesto.py` (simulacro) → `python __bn_manifiesto.py go`.
+* ✅ **Comprobado al generar** (el generador lo avisa solo): **ningún título se parece** a lo que ya está en el
+  banco en ferretería (C-62 cable · C-73 martillo · C-83/C-361 cemento · C-91/C-362 herramientas de mano ·
+  C-109 fierro · C-162 desarmadores · C-188 candado · C-194 ladrillo · C-445 pinturas · C-476 amoladora ·
+  C-507 calamina · C-535 espejos · C-243 materiales · C-248 herramientas · y los servicios C-274, C-287,
+  C-327) ni a los grupos ya pedidos (los oficios de construcción: C-577 … C-583).
+* 🔑 **Dato que se usó para no repetir**: el banco tiene **16 imágenes** de ferretería y solo **14 grupos** de
+  ese rubro, así que había material de sobra; los nombres «hermanos» que el censo pedía y que NO existían
+  como grupo entraron aquí con nombre propio (por ejemplo **«Juego de llaves mixtas»**, **«Tubería y
+  conexiones de PVC»**, **«Pintura látex para paredes»**).
+
+### 🆕 CARTA 11 DEL BANCO — 60 IMÁGENES DE VETERINARIAS Y MASCOTAS (2026-09-22, pedido del jefe)
+
+> *«Cambia de rubro y dame 60 más, pero esta vez en bloques de 10. Al diseñador solo le importa qué imagen
+> quieres (rubro y referencia de la imagen esperada) y qué código debe escribirle; no le importa más
+> información.»* → **NACE EL FORMATO DE UNA LÍNEA, y es el que manda desde aquí:**
+> `N. Crea una imagen de <lo que se ve> (rubro: X). Escribe el código C-xxx.`
+> ⛔ **FUERA de los pedidos del banco**: las reglas, el formato (3:4 / 1:1), el «no lleve el nombre de la
+> tienda», el manifiesto y los avisos de contexto. **Cada bloque son solo sus líneas, sin cabecera.**
+
+* **Qué son**: 60 imágenes para usarlas más adelante del rubro **Veterinarias y Mascotas** — el banco solo
+  tenía **6** (C-35 vacunación · C-36 alimento · C-72 arena y snacks · C-376 consulta · C-379 desparasitación ·
+  C-446 balanceado por kilo) más los grupos ya pedidos (C-463 higiene · C-494 urgencias · C-525 cepillado y
+  deslanado). Bloques de 10: **A** salud y consultorio · **B** baño y peluquería · **C** ropa y accesorios ·
+  **D** accesorios y juguetes · **E** alimento, medicinas y cuidado · **F** servicios y otros animales
+  (conejos y cuyes, aves, peces).
+* **Archivos**: cartas **`CARTA_IA_PRODUCTOS_BANCO11_{A..F}_10.md`** · cuerpos **`__b11_{a..f}_cuerpo.txt`**
+  (~2 KB cada uno: **solo las 10 líneas**, sin cabecera, listos para pegar) · registro **`__b11_grupos.json`**
+  (es lo que se agrega a `__rzc_grupos.json` cuando lleguen las imágenes) · generador **`__b11_gen.py`**.
+* ✅ **Corrige un préstamo malo**: el nombre **«Ropa para mascotas»** figuraba como *nombre hermano* de
+  **C-36 (Alimento para mascotas)**, así que hoy esas fichas muestran **la foto del alimento**; el grupo nuevo
+  (**C-738**) le da su imagen propia.
+* ⏳ **Estado: PEDIDAS, esperando imágenes** (códigos **C-718 … C-777**). Al llegar: manifiesto
+  `archivo = C-xxx` → `python __bn_manifiesto.py` (simulacro) → `python __bn_manifiesto.py go`.
+* 📌 **CÓDIGOS USADOS HASTA HOY (para no chocar)**: **C-01 … C-476** cargados en el banco · **C-538 … C-597**
+  carta 9 (pedida, no llegó) · **C-598 … C-717** carta 10 (ferretería) · **C-718 … C-777** carta 11
+  (veterinaria) · **C-778 … C-817** carta 12 (veterinaria, 40 más). **El próximo libre es el C-818.**
+
+### 🆕 CARTA 12 DEL BANCO — 40 IMÁGENES MÁS DE VETERINARIAS Y MASCOTAS (2026-09-22)
+
+> Pedido del jefe: *«Dame 40 más en bloques de 10.»* — mismo rubro que la carta 11 y **mismo formato de una
+> línea**: `N. Crea una imagen de <lo que se ve> (rubro: Veterinarias y Mascotas). Escribe el código C-xxx.`
+
+* **Bloques de 10 (4)**: **G** consultorio y tratamientos (inyección, curaciones, yeso, balanza, termómetro,
+  estetoscopio, jeringas, instrumentos de cirugía, camilla, sala de espera) · **H** higiene y aparatos de
+  peluquería (toallitas, pañales, bolsas para desechos, cepillo de dientes, cortaúñas, peine, secadora,
+  máquina de corte, tina, toalla y bata) · **I** casa y accesorios de paseo (caseta, corral, puerta para
+  mascotas, comedero automático, fuente de agua, arnés, correa retráctil, placa, cinturón de seguridad,
+  coche) · **J** alimento y medicinas 2 (alimento para gatitos y medicado, leche para cachorros, dieta blanda,
+  collar antipulgas, antibiótico, antiinflamatorio, gotas para los ojos, pomada cicatrizante, acondicionador).
+* **Archivos**: cartas **`CARTA_IA_PRODUCTOS_BANCO12_{G,H,I,J}_10.md`** · cuerpos **`__b12_{g,h,i,j}_cuerpo.txt`**
+  · registro **`__b12_grupos.json`** · generador **`__b12_gen.py`** (su comprobación avisa si un nombre choca
+  con el banco, con los grupos **o con la carta 11**).
+* ⏳ **Estado: PEDIDAS, esperando imágenes.** Con esto **Veterinarias y Mascotas queda con 100 imágenes
+  pedidas** (cartas 11 y 12) sobre las 6 que ya tenía el banco.
+  ✅ **PRIMERAS 6 CARGADAS (2026-09-21, manifiesto del jefe, «carga ya estos 6»): C-809 · C-811 · C-812 ·
+  C-813 · C-816 · C-817** (WebP 42-68 KB, `fotos/banco/banco_c-8xx-…`) → el banco pasó de **385 a 391**. Las 6
+  quedaron con **0 fichas** (son nombres de productos que todavía no existen en ninguna tienda: para eso es el
+  banco). 🔴 **Las 6 traen texto EN INGLÉS a la vista** («Derma-Care», «Dermin-Heal», «Vet-Guard», «Vet
+  Recipe», «Dermampet», «Vet Nurture»): el jefe ordenó subirlas tal cual. **El C-813 se subió como «Antibiótico
+  para mascotas»** aunque su foto es de una dieta blanda: orden del jefe («déjalo como antibiótico»).
+  📌 **Antes de cargar hubo que agregar los grupos de las cartas 11, 12 y 13 al registro**
+  (`python __bn_grupos_merge.py go` → `__rzc_grupos.json` pasó de **375 a 535 grupos**): el cargador
+  **solo acepta códigos que existan en `__rzc_grupos.json`**.
+
+### 🆕 CARTA 13 DEL BANCO — 60 IMÁGENES DE HOGAR, BAZAR Y ELECTRODOMÉSTICOS (2026-09-22)
+
+> Pedido del jefe: *«60 más.»* — rubro elegido: **Hogar, Bazar y Electrodomésticos** (30 productos sin foto y
+> el banco solo tenía **2**: C-370 Juego de ollas y C-450 Lavadora; más los grupos ya pedidos C-395 Ropero de
+> dos puertas, C-483 Cocina a gas y C-514 Colchón de dos plazas).
+
+* **6 bloques de 10**: **A** cocina · electrodomésticos pequeños (licuadora, batidora, olla arrocera, freidora
+  de aire, sandwichera, tostadora, cafetera, hervidora, exprimidor, microondas) · **B** cocina · menaje y
+  vajilla (sartén, cuchillos, tabla, vajilla, cubiertos, vasos, tazas, táperes, jarra, utensilios) ·
+  **C** electrodomésticos de la casa (refrigeradora, congeladora, televisor, ventilador, horno eléctrico,
+  plancha, aspiradora, parlante, máquina de coser, campana extractora) · **D** limpieza y orden (escoba,
+  trapeador, recogedor, balde, basurero, tendedero, pinzas, organizadores, canasta, ganchos) · **E** dormitorio
+  y baño · textiles (sábanas, frazada, almohada, toallas, cortina, alfombra, mantel, dispensador, juego de
+  baño, espejo de baño) · **F** muebles y decoración (sofá de tres cuerpos, juego de comedor, zapatera,
+  perchero, lámpara de mesa, reloj de pared, cuadro, florero, frutero, set de copas).
+* **Archivos**: cartas **`CARTA_IA_PRODUCTOS_BANCO13_{A..F}_10.md`** · cuerpos **`__b13_{a..f}_cuerpo.txt`**
+  · registro **`__b13_grupos.json`** · generador **`__b13_gen.py`**.
+* ✅ **Toca 2 nombres que el censo pedía**: **«Refrigeradora»** (3 fichas sin foto) y **«Lavadora»** ya
+  existía; y **«Sofá de tres cuerpos»** / **«Juego de comedor»** también estaban en la lista de pendientes.
+* ⚠️ **Aviso que dio el generador**: «Refrigeradora» figura como *nombre hermano* de **C-60 «Reparación de
+  refrigeradora»** (rubro *Tecnología e Internet*). La clave del banco es **NOMBRE + RUBRO**, así que eso no
+  cubre el rubro Hogar: el grupo nuevo (**C-838**) es el que le da su imagen propia.
+* ⏳ **Estado: PEDIDAS, esperando imágenes.** Códigos **C-818 … C-877** · **el próximo libre es el C-878**.
+
+### 📥 LA CARGA DEL MANIFIESTO DEL JEFE (2026-09-21) — **53 imágenes al banco, de a poco**
+
+> El jefe fue dando los pares `archivo = C-xxx` **con la descripción de cada imagen** («te voy dando de a poco
+> los detalles… no pierdas tiempo verificando, tienes que confiar en mis ojos») y ordenó **cargar en el
+> momento** («carga ya estos 6»). **No se usó visión ni subagentes.**
+
+* **1.ª tanda (6)**: C-809 · C-811 · C-812 · C-813 · C-816 · C-817 (veterinaria) → cargadas tal cual; traen
+  **texto en inglés a la vista** («Derma-Care», «Dermin-Heal», «Vet-Guard», «Vet Recipe», «Dermampet»,
+  «Vet Nurture») y el **C-813 se subió como «Antibiótico»** aunque su foto es una dieta (orden del jefe).
+* **2.ª tanda (47)**: C-619 · C-620 · C-621 · C-622 · C-623 · C-624 · C-627 · C-628 · C-630 · C-631 · C-632 ·
+  C-633 · C-634 · C-635 · C-636 · C-637 · C-641 · C-645 · C-649 · C-654 (ferretería) · C-718 … C-727 y
+  C-778 … C-787 (veterinaria) · C-808 · C-819 · C-821 · C-823 · C-824 · C-825 · C-826 (veterinaria/hogar).
+  **46 entraron y el C-784 falló por red** (`EOF occurred in violation of protocol`); ✅ **se reintentó y entró**
+  (el cargador **conserva el archivo** cuando falla: por eso se conserva aunque el resto se borre).
+* **3.ª tanda (1)**: `1 (16).jpeg` → **C-820 «Olla arrocera»** (el jefe confirmó que se le cruzó el número).
+* **4.ª tanda (24 + 6 variantes repetidas)**: **C-848 … C-857** del rubro hogar (escoba, recogedor, trapeador,
+  balde, basurero, tendedero, pinzas de ropa, organizador, canasta, ganchos) y **C-638 · C-639 · C-640 ·
+  C-642 · C-643 · C-644 · C-646 · C-647 · C-648 · C-650 · C-651 · C-652 · C-653 · C-655** de ferretería
+  (tubería de PVC, llave de paso, grifo de lavadero, manguera, inodoro, lavadero, sifón, rejilla, flotador,
+  terma, tubo de desagüe, trampa de grasa, bomba de agua, riego por goteo).
+  🔴 **EL DISEÑADOR MANDÓ DOS VARIANTES DE 6 CÓDIGOS** (C-638, C-639, C-640, C-642, C-643 y C-651): el cargador
+  **se queda con el PRIMER archivo del manifiesto** y **borra la variante repetida** — así se borraron
+  `1 (102)`, `1 (103)`, `1 (104)`, `1 (105)`, `1 (106)` y `1 (107)`. **Es el mismo patrón del 2026-09-22:
+  hay que esperar códigos repetidos en el manifiesto.**
+* 🏦 **El banco pasó de 385 a 463 imágenes** (**78 cargadas hoy**) · Descargas de **116 a 32 archivos**
+  (**84 borrados**: 78 usados + 6 variantes repetidas).
+* ✅ **Fichas tapadas de verdad**: **Juego de llaves mixtas (C-620) 3** · **Tubería y conexiones de PVC (C-638)
+  3** · **Organizador de plástico (C-855) 1** · **Corte de uñas para mascotas (C-724) 1**. El resto **0
+  fichas** (son nombres de productos que todavía ninguna tienda vende).
+* ⚠️ **Texto/marca en inglés a la vista en varias**: «Oatey» (pegamento de PVC, en C-638 · C-647 · C-651),
+  «DeWalt» (en C-636 y C-637) y las de veterinaria («Derma-Care», «Dermin-Heal», «Vet-Guard», «Vet Recipe»,
+  «Dermampet», «Vet Nurture»). **El jefe ordenó subirlas tal cual.**
+* ✅ **El `1 (16).jpeg` SÍ se cargó, pero como C-820 «Olla arrocera»** (el jefe confirmó que se le cruzó el
+  número: C-800 es «Puerta para mascotas»). ⏳ **Único pendiente: `1 (10).jpeg`**, que el jefe puso como C-820
+  **sin descripción**: se espera que diga qué se ve para cargarlo.
+* 🔧 **REGLA NUEVA ANTES DE CARGAR: `python __bn_grupos_merge.py go`** — mete los grupos de las cartas
+  pedidas en `__rzc_grupos.json` (**375 → 655 grupos**), porque el cargador **solo acepta códigos que existan
+  ahí** (si no, avisa «código que no existe en ninguna lista» y **no toca la imagen**).
+
 
 
 ### 🔴 FICHAS CON FOTO ROTA (2026-09-22): **50 fichas · 40 rutas**
@@ -1425,6 +1570,126 @@ Supermercados»** pero es **un colegio** (su domicilio es el mismo de la IE 5495
 Amaru, Rinconada`) → se le pusieron productos de colegio (manda la actividad real) y **sus imágenes se
 tomaron del banco en el rubro «Educación y Academias»** (autorizado a mano en `__p20_run.py` →
 `EXCEPCIONES`). **Al jefe se le avisa**, porque su rubro sigue mal en la base.
+
+---
+
+## A.9.7 ⭐ SUBIR A 5 LOS PRODUCTOS DE LAS FERRETERÍAS (2026-09-22 — el banco prestando en masa)
+
+> **Encargo del jefe, textual:** *«Tenemos un banco de imágenes: úsalo para aumentar el número de productos
+> de las tiendas a 5. Inicia por el área de ferreterías: si tiene 3 agrégale 2 más, si tiene 4 una más, hasta
+> completar 5, y le pones de imagen la que tenemos en el banco.»*
+> Confirmado en la misma sesión: **TODAS las ferreterías con menos de 5** (no solo las de 3 y 4) y **precio a
+> criterio** (el rasero de `GUIA_PRECIOS_DE_PRODUCTOS.md` §3).
+
+**La regla, en una línea:** de las **274 ferreterías activas**, las **252 con menos de 5 productos** se quedan
+en **5**; las **22 que ya tenían 5 o más NO se tocan**. Nada se borra: **solo se AGREGA** (los productos que
+la tienda ya tenía se quedan como están y el escritor salta cualquier título repetido).
+
+| Lo que salió (2026-09-22) | |
+|---|---|
+| Fichas tocadas | **252** (130 con 0 productos · 35 con 2 · 4 con 3 · 83 con 4) |
+| Productos creados | **846** (650 + 105 + 8 + 83) |
+| Con imagen del **banco** | **846 (100 %)** — el banco PRESTA: la ficha apunta a `fotos/banco/…` |
+| Saltados / avisos de imagen | **0 / 0** |
+| Después | **274 de 274 ferreterías en 5 o más · 0 por debajo** (medido con la sonda de censo) |
+| Comprobado por HTTP | 4 fichas al azar: **200** y sus productos nuevos visibles; la imagen del banco, **200** |
+
+**Las piezas (todas en la raíz, ninguna en `deploy/`: el sitio no cambió ni una línea):**
+
+| Archivo | Qué es |
+|---|---|
+| `__p5_leer.py` | **Lectura**: corre la sonda de censo por rubro (`&rubro=…`) y guarda `__p5_pag1..5.json` + un resumen legible `__p5_resumen.txt`. |
+| `__p5_catalogo.py` | **EL CATÁLOGO**: 48 productos de ferretería con **nombre + código del banco + precio + unidad + descripción + etiquetas**. Los 48 nombres son, uno por uno, nombres que **ya tienen imagen** en el banco. |
+| `__p5_armar.py` | Arma el pedido: lee la descripción REAL de cada tienda, le detecta la especialidad (construcción · herramienta · pintura · gasfitería · baño · electricidad · cerrajería · vidriería · jardín) y le reparte los 5 productos (barajado con la semilla del id, para que dos tiendas seguidas no queden idénticas). Salidas: `__p5_pedido.json` y la tabla de revisión `__p5_revision.txt`. |
+| `__p5_validar.py` | **Revisión local antes de escribir**: cupos, títulos repetidos (dentro del pedido y contra lo que la tienda ya vende), rutas del banco y rubro, y que quepan en el esquema (120 / 30 / 500). |
+| `__p5_run.py` | Lanzador: `revisar` · `simulacro` · **`go`** · **`borrar`** · `enlaces`. Usa la sonda **`__ep_prod_crear.php` con `&max=5`** (misma sonda del §A.9.6) y deja el registro **`__p5_creado.json` (846 ids)** para deshacer la corrida entera. |
+| `__p5_check.py` | Comprobación por HTTP (pocas peticiones, 2 s de pausa). |
+| `__p5_enlaces.txt` | Los **252 enlaces** de las fichas tocadas. |
+
+**🔴 TRAMPAS Y COSAS QUE HAY QUE SABER:**
+
+1. **El banco NO tenía calamina ni espejos** (los `C-507` y `C-535` que menciona el §A.9.4 de arriba **no
+   existen** en `__banco_imagenes.json`): el banco tiene **50 imágenes** de Ferreterías y Construcción, no 53.
+   Antes de armar cualquier tanda, **mirar el registro** (`__banco_imagenes.json`) y no fiarse de la memoria
+   de la guía: los dos nombres se sacaron del catálogo para que **los 846 productos llevaran imagen del banco**.
+2. **El escritor cuenta TODAS las filas de `directorio_servicios`** de la ficha (activas o no) para su candado
+   `max`, y **lo mismo hace la sonda de censo**: así el censo y el escritor no se contradicen.
+3. **El rubro de la base manda y aquí estaba bien**: las fichas raras de esta tanda (IMPERIA INMOBILIARIA,
+   Oficina Steel Asesoría, Diseño de Casas, PUNTO DE REUNIÓN DEL SUBPROYECTO A2 TRAMO 2) dicen en su propia
+   descripción que son **empresa constructora**: van con materiales de construcción, no con otra cosa.
+   Los 2 casos donde el banco **no tiene** el producto del negocio (una de **extintores** y una de **aparejos
+   navales**: cabos y grilletes) llevaron ferretería de línea general; si el jefe quiere, se le pide al
+   diseñador la imagen propia de esos rubros.
+4. **Esto NO pisa fotos ni precios de nadie**: el producto es nuevo (nace con la imagen del banco y su precio a
+   criterio) y, cuando el dueño suba su foto, el banco recupera la suya solo (§A.9.4, regla 2).
+
+**⏳ LO QUE SEGUÍA (el mismo día, y ya está hecho):** el censo decía **4 972 fichas activas con menos de 5
+productos** y **16 332 productos faltantes**. Se hicieron **todos los rubros** — ver el §A.9.8.
+
+---
+
+## A.9.8 ⭐⭐ LA CAMPAÑA COMPLETA: TODAS LAS TIENDAS DEL SITIO A 5 PRODUCTOS (2026-09-22, la misma noche)
+
+> **Orden del jefe, textual:** *«Sigue, sigue, no pares.»* Después de ferreterías (§A.9.7) se corrieron
+> **los 39 rubros** que tenían tiendas por debajo de 5.
+
+| | |
+|---|---:|
+| Fichas que se subieron a 5 | **4 972** (de 252 a 1 018 por rubro) |
+| Productos nuevos creados | **16 314** |
+| Con imagen del **banco** | **14 966 (91,7 %)** |
+| Sin imagen (el banco no tiene esa foto) | **1 348** (≈ 250 nombres distintos → lista de compras del diseñador) |
+| Rubros trabajados | **39** (catálogo propio para cada uno) |
+| Saltados / fallos | **0** |
+| **Estado del sitio después** | **5 299 de 5 299 fichas activas en 5 o más · 0 por debajo** |
+
+⚠️ **LAS 6 DE «Empleos y Trabajos» TAMBIÉN SE HICIERON (mismo día, al final):** esas fichas son **avisos de
+empleo**, así que **no se les puso ningún producto con precio inventado**: se les agregaron **18 PUESTOS DE
+TRABAJO** (cocinero, ayudante de cocina, lavavajilla, mozo, almacenero, vigilante, operario de producción,
+ayudante de reparto, ayudante de mina…) con **precio 0 (= «a consultar») y unidad «por puesto»**, exactamente
+como los 12 puestos que esas fichas ya tenían (comprobado fila por fila antes de escribir). El reparto
+automático se **reemplazó por uno escrito a mano** (`__pr_empleos_pedido.py`): por palabras, a una ficha de
+**minería** le tocaba «Atención al cliente en cevichería». Los servicios de agencia (publicación, selección,
+asesoría de CV, capacitación) **se quitaron del catálogo**: esa ficha es un aviso, no una agencia.
+👉 **Total de la campaña: 16 332 productos nuevos** (14 966 con imagen del banco) y **0 fichas por debajo de 5**.
+
+### 🧰 EL MOTOR GENÉRICO (un rubro = un archivo de configuración + los mismos 6 comandos)
+
+| Pieza | Qué es |
+|---|---|
+| `__pr_rubros.py` | La tabla **slug corto ↔ nombre EXACTO del rubro en la base** (39 rubros) y el volcado `__pr_banco_<slug>.txt` (qué imágenes tiene el banco de ese rubro). |
+| **`__pr_cfg_<slug>.json`** | **EL CATÁLOGO DEL RUBRO**: `rubro`, `items` (nombre · `codigo` del banco · precio · unidad · descripción · etiquetas), `pistas` (qué palabras de la descripción de la tienda delatan su especialidad) y `prioridad` (qué etiquetas se miran primero). 39 archivos, uno por rubro. |
+| `__pr_check_cfg.py <slug>` | **El revisor del catálogo**: JSON válido · **todos** los códigos del banco del rubro usados con el nombre copiado TAL CUAL · precio > 0 · unidad ≤ 30 · descripción ≤ 400 · cada lista de prioridad termina en `gen`. **No se escribe nada con el revisor en rojo.** |
+| `__pr_leer.py <slug>` | Lee las tiendas del rubro con la sonda de censo (páginas de 60) → `__pr_<slug>_pagN.json` + `__pr_<slug>_resumen.txt`. |
+| `__pr_armar.py <slug>` | Reparte: manda la **especialidad real** de la tienda (leída de su descripción), nunca repite lo que ya vende, **no pone dos nombres parecidos en la misma tienda** (`parecidos()`: «Parihuela» y «Parihuela - Sopa de Mariscos…» no van juntas) y **prefiere los productos CON imagen del banco**. |
+| `__pr_validar.py <slug>` | Revisa el pedido entero **antes** de tocar el sitio (cupos, títulos repetidos, rutas y rubro del banco, esquema). |
+| `__pr_run.py <slug> revisar\|simulacro\|go\|borrar\|enlaces` | Crea de verdad con la sonda **`__ep_prod_crear.php` (`&max=5`, la del §A.9.6)** **en trozos de 600 productos** (un POST gigante se corta), y deja el registro `__pr_<slug>_creado.json` para **deshacer el rubro entero**. |
+| `__pr_tanda.py <slugs…>` | Corre la tanda completa: armar → validar → crear → resumen (y **sigue con el próximo rubro aunque uno falle**). |
+| `__pr_falta_banco.py` | Saca **la lista de lo que le falta al banco**: los productos que quedaron sin foto, ordenados por cuántas fichas los piden → `__pr_falta_banco.txt`. |
+
+### 🔴 LO QUE SE APRENDIÓ EN ESTA CAMPAÑA (leer antes de la próxima)
+
+1. **EL BANCO MANDA, PERO NO SIEMPRE ALCANZA.** Cada rubro tiene su catálogo hecho con **los nombres que YA
+   tienen imagen en el banco** (restaurantes 90 · ferretería 50 · bodegas 42 · veterinaria 33 · ropa 22 ·
+   hogar 19 …). Cuando el banco tiene pocas imágenes (Educación **4**, Salud 15, Habitaciones 8) el cuarto y
+   quinto producto de la tienda **salen sin foto**: por eso el total con imagen es **91,7 %** y no el 100 %.
+   ⚠️ **La memoria de la guía NO es la verdad: el registro `__banco_imagenes.json` sí** (decía que había
+   calamina y espejos de ferretería y **no existían**).
+2. **DOS RUBROS SIN NINGUNA IMAGEN EN EL BANCO SE RESOLVIERON CON LA EXCEPCIÓN YA AUTORIZADA** (§0.1.1: el
+   mismo producto en dos rubros): **Clínicas y Hospitales** usa las imágenes de *Profesionales de la Salud* y
+   **Textil y Confecciones** las de *Tiendas de ropa*, declarándolo en el catálogo con
+   **`"rubros_permitidos": [...]`**. Sin esa clave, el armador y el validador **rechazan la imagen**.
+3. **RUBROS SIN BANCO PROPIO** (Juegos, Agua, Juguetes y Empleos tienen **0 imágenes**): sus productos se
+   crearon **sin foto** y **su catálogo ES la lista de compras** para el diseñador.
+4. **LA RED SE CAE A MITAD DE UNA TANDA.** En la corrida larga, el POST de *Abogados y Contadores* murió con
+   `RemoteDisconnected` (el hosting cerró la conexión): **no se escribió nada** y el lanzador se detuvo.
+   **Arreglado en `__pr_tanda.py`**: cada rubro va en `try/except` y, si el resultado no llegó, avisa
+   «falló la escritura» y **sigue con el siguiente**; el rubro se reintenta en la corrida siguiente.
+5. **EL NÚMERO BUENO ES EL REGISTRO, NO EL RESUMEN.** Lo creado se cuenta sumando `cuantos` de los
+   `__pr_*_creado.json` (**16 314**) y lo que falta se mide con la sonda de censo (`&modo=rubros&max=5`).
+6. **NADA SE BORRÓ NI SE PISÓ.** Todo fue `INSERT` de productos nuevos; los que la tienda ya vendía se
+   quedaron como estaban y el escritor **salta** cualquier título repetido (por eso «SALTADOS: 0» significa
+   que no hubo ni un choque). Cada rubro tiene su **deshacer**: `python __pr_run.py <slug> borrar`.
 
 ---
 

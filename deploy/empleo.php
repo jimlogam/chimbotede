@@ -502,11 +502,13 @@ include __DIR__ . '/includes/header.php';
             Dura <?= (int)EMPLEO_DIAS ?> días y se publica en un minuto.
         </p>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-            <a class="btn" href="<?= e(url('empleos') . '?nuevo=ofrezco#publicar') ?>"
+            <?php // ⛔ SIN ANCLAS (orden del jefe, 2026-09-21): estos dos botones llevaban al final
+                  //    `#publicar`. El parámetro `?nuevo=` ya abre el formulario con el tipo elegido. ?>
+            <a class="btn" href="<?= e(url('empleos') . '?nuevo=ofrezco') ?>"
                style="background:var(--marca-naranja,#ea6a12);border-color:var(--marca-naranja,#ea6a12);color:#fff;
                       min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;
                       font-size:16px;text-decoration:none;white-space:nowrap">💼 Publicar un trabajo</a>
-            <a class="btn" href="<?= e(url('empleos') . '?nuevo=busco#publicar') ?>"
+            <a class="btn" href="<?= e(url('empleos') . '?nuevo=busco') ?>"
                style="background:#123c6b;border-color:#123c6b;color:#fff;
                       min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;
                       font-size:16px;text-decoration:none;white-space:nowrap">🙋 Busco trabajo</a>

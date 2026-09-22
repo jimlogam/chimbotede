@@ -212,7 +212,9 @@ HTML;
             foreach ($negocios as $n) {
                 $activo = ((int)$n['id'] === (int)$sel['id']) ? ' pv-pick__chip--on' : '';
                 $titulo = $n['nombre'] . (!empty($n['categoria_nombre']) ? ' · ' . $n['categoria_nombre'] : '');
-                $html .= '<a class="pv-pick__chip' . $activo . '" href="' . e(url('panel.php?reco=' . (int)$n['id'])) . '#recomendados" title="' . e($titulo) . '">'
+                // ⛔ SIN ANCLAS (orden del jefe, 2026-09-21): llevaba a `panel.php?reco=ID#recomendados`.
+                //    El parámetro `reco` ya dice qué proveedor mostrar: el ancla sobraba.
+                $html .= '<a class="pv-pick__chip' . $activo . '" href="' . e(url('panel.php?reco=' . (int)$n['id'])) . '" title="' . e($titulo) . '">'
                        . '<span aria-hidden="true">' . e($n['categoria_icono'] ?: '🏪') . '</span>'
                        . '<span class="pv-pick__nom">' . e($n['nombre']) . '</span></a>';
             }

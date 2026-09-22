@@ -42,6 +42,25 @@
   (el mensaje va listo para copiar). Sigue pendiente: **32 códigos que no llegaron** (bloques C y D de la
   tanda 6 = `CARTA_IA_PRODUCTOS_BANCO6_{C,D}_15.md`), la duda del **`C-350`** y las **12 imágenes sin
   manifiesto** que quedan en Descargas.
+- ⭐ **SUBIR LAS TIENDAS A 5 PRODUCTOS CON EL BANCO (2026-09-22, pedido del jefe: «aumentar el número de
+  productos de las tiendas a 5, inicia por ferreterías… y le pones de imagen la que tenemos en el banco»):**
+  ✅ **FERRETERÍAS HECHO — 252 fichas · 846 productos · los 846 con imagen del banco · 274 de 274 ferreterías
+  en 5 o más y 0 por debajo.** Herramientas: `__p5_leer.py` (lee) · `__p5_catalogo.py` (48 productos de
+  ferretería con su código del banco) · `__p5_armar.py` (reparte por especialidad leída de la descripción) ·
+  `__p5_validar.py` (revisa sin tocar el sitio) · `__p5_run.py revisar|simulacro|go|borrar|enlaces` (usa la
+  sonda `__ep_prod_crear.php` con **`&max=5`**; deshacer con `__p5_creado.json`) · enlaces en
+  `__p5_enlaces.txt`. 📖 **El detalle y las 4 trampas, en el §A.9.7 de
+  `GUIA_PRODUCTOS_IMAGENES_Y_CONTEXTO.md`.** ✅ **Y EL MISMO DÍA SE HICIERON LOS 39 RUBROS (orden del jefe:
+  «sigue, sigue, no pares»): 4 972 fichas · 16 314 productos · 14 966 (91,7 %) con imagen del banco · 0
+  saltados · el sitio quedó en **5 299 de 5 299 fichas activas con 5 o más y 0 por debajo** (16 332 productos
+  nuevos en total; los últimos 18 son los **puestos de trabajo** de los 6 avisos de «Empleos y Trabajos», con
+  **precio 0 «a consultar» y unidad «por puesto»**, como los que esas fichas ya tenían:
+  `__pr_empleos_pedido.py`). 🧰 **El motor genérico de esta campaña** (un rubro = un `__pr_cfg_<slug>.json`):
+  `__pr_check_cfg.py` (revisor) · `__pr_leer.py` · `__pr_armar.py` · `__pr_validar.py` · `__pr_run.py
+  revisar|simulacro|go|borrar|enlaces` (sonda `__ep_prod_crear.php` con `&max=5`, en trozos de 600) ·
+  `__pr_tanda.py` (tanda completa, sigue aunque un rubro falle) · `__pr_falta_banco.py` (las imágenes que le
+  faltan al banco → `__pr_falta_banco.txt`). 📖 **Detalle y las 6 lecciones, en el §A.9.8 de
+  `GUIA_PRODUCTOS_IMAGENES_Y_CONTEXTO.md`.**
 - 📊 **Tiendas: 5 300** (5 162 con portada · 137 sin ninguna foto) pero **solo 2 917 tienen productos**.
   El 2026-09-21 hubo una **carga de 3 490 portadas** llamadas **`<slug>_01.webp`** (ya **no** `photo_`):
   los pozos de portadas medidos antes de esa fecha **están viejos, hay que volver a medirlos**.

@@ -67,8 +67,10 @@ if (!function_exists('doc_pagina_render')) {
     <h1 class="dc-h2">El capítulo no se encontró</h1>
     <p class="dc-pre">La dirección solicitada no corresponde a ningún capítulo de este documento.
        Vuelva a la portada del documento y elija el capítulo que busca.</p>
-    <a class="dc-btn dc-btn--pdf" href="<?= e(doc_legal_url($id)) ?>">Ver la portada del documento</a>
-    <a class="dc-btn dc-btn--linea" href="<?= e(url('nosotros')) ?>">Volver al área Nosotros</a>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+      <a class="b3d b3d--granate" href="<?= e(doc_legal_url($id)) ?>"><span>📕 Ver la portada del documento</span></a>
+      <a class="b3d b3d--gris" href="<?= e(url('nosotros')) ?>"><span>🏪 Volver al área Nosotros</span></a>
+    </div>
   </div>
 </div>
                 <?php

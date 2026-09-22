@@ -113,21 +113,13 @@ include __DIR__ . '/includes/header.php';
 
 <!-- Stats -->
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px">
-    <?php /* 🆕 2026-09-16 (pedido del jefe): la tarjeta «Mis negocios» del marcador es un ENLACE ANCLA
-             al área donde están sus tiendas (`#mis-negocios`, aquí abajo). Se ve igual que las otras
-             tarjetas, pero al tocar el número el navegador baja solito a su lista de negocios. */ ?>
-    <?php if (es_dueno()): ?>
-    <a href="#mis-negocios" title="Ir a mis negocios"
-       style="background:#fff;padding:16px;border-radius:12px;box-shadow:var(--sombra-tarjeta);border-top:4px solid var(--color-acento);text-decoration:none;display:block;color:inherit">
-        <div style="font-size:24px;font-weight:700;color:var(--color-primario)"><?= $stats['total_negocios'] ?></div>
-        <div style="font-size:12px;color:var(--color-texto-claro);text-transform:uppercase;letter-spacing:0.05em">Mis negocios ↓</div>
-    </a>
-    <?php else: ?>
+    <?php /* ⛔ SIN ANCLAS (orden del jefe, 2026-09-21): esta tarjeta del marcador era un ENLACE ANCLA a
+             `#mis-negocios` (el «↓» que bajaba a la lista de abajo). Ahora es una tarjeta más: la lista
+             de sus negocios está justo debajo, así que el salto no hacía falta. */ ?>
     <div style="background:#fff;padding:16px;border-radius:12px;box-shadow:var(--sombra-tarjeta);border-top:4px solid var(--color-acento)">
         <div style="font-size:24px;font-weight:700;color:var(--color-primario)"><?= $stats['total_negocios'] ?></div>
         <div style="font-size:12px;color:var(--color-texto-claro);text-transform:uppercase;letter-spacing:0.05em">Mis negocios</div>
     </div>
-    <?php endif; ?>
     <div style="background:#fff;padding:16px;border-radius:12px;box-shadow:var(--sombra-tarjeta);border-top:4px solid #22c55e">
         <div style="font-size:24px;font-weight:700;color:#15803d"><?= number_format($stats['total_vistas']) ?></div>
         <div style="font-size:12px;color:var(--color-texto-claro);text-transform:uppercase;letter-spacing:0.05em">Vistas totales</div>

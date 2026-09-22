@@ -535,9 +535,12 @@ function muro_chat_html($n = 12, $alto = 0, $pie = true) {
         $h .= '<div class="mchat__pie">';
         // 📲 El jefe lo pidió así: *«ofrece ahí la opción de recibir estos mensajes en mi Telegram…
         //    el usuario que quiera que le envíen va a poner ahí su Telegram y le va a llegar todo»*.
-        $h .= '<a class="mchat__cta mchat__cta--tg" href="' . e(url('en-vivo#telegram')) . '">'
+        // ⛔ SIN ANCLAS (orden del jefe, 2026-09-21): los dos botones llevaban a `en-vivo#telegram` y
+        //    `en-vivo#pedir` (saltos dentro de la página de En vivo). Ahora llevan a la página, que es
+        //    donde están las dos cosas.
+        $h .= '<a class="mchat__cta mchat__cta--tg" href="' . e(url('en-vivo')) . '">'
             . '📲 Recibir estos mensajes en mi Telegram</a>';
-        $h .= '<a class="mchat__cta" href="' . e(url('en-vivo#pedir')) . '">🛠️ Publicar lo mío</a>';
+        $h .= '<a class="mchat__cta" href="' . e(url('en-vivo')) . '">🛠️ Publicar lo mío</a>';
         $h .= '<a class="mchat__cta mchat__cta--suave" href="' . e(url('crear-tienda?modo=producto')) . '">➕ Subir un producto</a>';
         $h .= '</div>';
     }

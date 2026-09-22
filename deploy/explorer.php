@@ -159,7 +159,8 @@ $canonical_url      = url('explorer.php');
         <a class="exh__tab" href="<?= url('buscar.php') ?>" title="Tiendas"><?= explorer_icono('tiendas') ?><span>Tiendas</span></a>
         <a class="exh__tab" href="<?= e(explorer_url(['filtro' => null, 'cat' => null, 'zona' => null, 'post' => null])) ?>" data-ex-abrir-rubros title="Rubros"><?= explorer_icono('rubros') ?><span>Rubros</span></a>
         <a class="exh__tab<?= $filtro === 'producto' ? ' is-on' : '' ?>" href="<?= e(explorer_url(['filtro' => 'producto'])) ?>" title="Productos"><?= explorer_icono('productos') ?><span>Productos</span></a>
-        <a class="exh__tab" href="<?= e(explorer_url(['filtro' => null, 'cat' => null, 'zona' => null, 'post' => null])) ?>#historias" title="Historias"><?= explorer_icono('historias') ?><span>Historias</span></a>
+        <?php // ⛔ SIN ANCLAS (orden del jefe, 2026-09-21): esta pestaña llevaba al final `#historias`. ?>
+        <a class="exh__tab" href="<?= e(explorer_url(['filtro' => null, 'cat' => null, 'zona' => null, 'post' => null])) ?>" title="Historias"><?= explorer_icono('historias') ?><span>Historias</span></a>
     </nav>
 
     <div class="exh__der">

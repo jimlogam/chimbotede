@@ -444,6 +444,31 @@ llevan a la misma página pero tiene dos entradas»*.
   interno**, **los datos** (`nosotros_planes()` con los 5 planes · `nosotros_novedades()` con las 14
   novedades · `nosotros_numeros()` con los números reales del sitio, en `try/catch`) y el **bloque de
   documentación oficial**. Por eso cada página del área es un archivo corto con solo su contenido.
+- 🎨 **4.ª VUELTA DEL JEFE (2026-09-21): A TODO EL ANCHO · BOTONES CON 3D · TARJETAS POR COLORES.**
+  Textual: *«los botones no parecen botones, necesitan el efecto 3D para que se vean como botones
+  cliqueables y como es una sección de temas de lectura ocupa todo el ancho de la pantalla, no dejes
+  espaciado a los costados… y las tarjetas sepáralas por colores»*. Cómo quedó:
+  - **A todo el ancho:** los contenedores del área (`.ns-wrap`) y de la documentación (`.dc-wrap`) ya **no
+    llevan `max-width`**: ocupan el 100 % con un margen mínimo de 10 px, y las rejillas usan
+    `repeat(auto-fit, minmax(320px,1fr))`, así que **llenan la pantalla con 2, 3 o 4 columnas** según el
+    ancho (novedades, planes, documentos, capítulos y la guía).
+  - **🤘 BOTONES 3D — la clase `.b3d`:** vive **UNA sola vez en `assets/css/components.css`** (por eso el
+    `?v=` subió a **28**), porque la usan el área **y** las páginas de los documentos. El volumen se logra
+    con **sombra sólida debajo** (el canto de la tecla), **brillo diagonal** encima, **luces interiores**
+    (arriba claro, abajo oscuro) y, al pulsar, el botón **baja 4 px y la sombra se acorta** (se hunde de
+    verdad). Los colores van por variables (`--b3a` luz · `--b3b` base · `--b3c` canto), con variantes
+    `--granate · --naranja · --wa · --verde · --azul · --violeta · --rosa · --crema · --gris` y tamaños
+    `--sm` (atajos) y `--full` (acción). La usan el menú interno del área, los accesos de la portada, los
+    atajos de la guía, el enlace de cada novedad, los planes, los capítulos, «Descargar en PDF», «Leer en
+    línea», «anterior/siguiente» y la vuelta a Nosotros.
+  - **🎨 TARJETAS POR COLORES — `includes/paleta.php`:** una **paleta de 8 tonos** (granate · naranja ·
+    ámbar · verde · azul · violeta · turquesa · rosa); cada tono trae el color fuerte (`tk`), el **fondo
+    teñido** de la tarjeta (`tkt`) y los tres del botón (`a`/`b`/`c`). El PHP reparte los tonos con
+    `paleta_tono($i)` y `paleta_tono_boton($i)` (rotando por el índice de la lista), así **dos tarjetas
+    vecinas nunca se ven iguales**; los **5 planes** llevan color propio y fijo (Gratis **verde** ·
+    Emprende **azul** · Vende Más **violeta** · Premium **dorado** · Aliados **turquesa**). Cada tarjeta
+    es un filete de 6 px de su color + fondo teñido + título del color + sombra con canto (también se ve
+    «cliqueable»).
 - **Contenido** (móvil primero, con el mismo lenguaje del sitio):
   · **la guía en dos caminos** —🛍️ *si vienes a comprar* (7 pasos: buscar, «cerca de mí», entrar a la
   ficha, ❤️ «Me interesa», el pedido por WhatsApp, opinar, noticias y empleos) y 🏪 *si tienes un

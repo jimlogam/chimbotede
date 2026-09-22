@@ -52,8 +52,10 @@ nosotros_area_css();
   <?= nosotros_area_menu('precios') ?>
 
   <div class="ns-planes">
-    <?php foreach ($planes as $p): ?>
-      <article class="ns-plan <?= e($p['tono']) ?>">
+    <?php // 🎨 Cada plan con SU color: Gratis verde · Emprende azul · Vende Más violeta · Premium dorado · Aliados turquesa ?>
+    <?php $tonos_plan = [3, 4, 5, 2, 6]; ?>
+    <?php foreach ($planes as $i => $p): ?>
+      <article class="ns-plan <?= e($p['tono']) ?>" style="<?= e(nosotros_tono($tonos_plan[$i] ?? $i)) ?>">
         <?php if ($p['sello'] !== ''): ?>
           <span class="ns-plan__sello"><?= e($p['sello']) ?></span>
         <?php endif; ?>
@@ -81,11 +83,11 @@ nosotros_area_css();
   <div class="ns-planes__pie">
     <?php $wa_planes = url_whatsapp_admin('¡Hola! 👋 Vi los planes en ' . url_actual() . ' y quiero activar uno para mi negocio.'); ?>
     <?php if ($wa_planes !== ''): ?>
-      <a class="ns-btn ns-btn--wa" href="<?= e($wa_planes) ?>" target="_blank" rel="noopener">
-        <?= wa_icono_svg() ?> Quiero activar un plan
+      <a class="b3d b3d--wa" href="<?= e($wa_planes) ?>" target="_blank" rel="noopener">
+        <?= wa_icono_svg() ?> <span>Quiero activar un plan</span>
       </a>
     <?php endif; ?>
-    <a class="ns-btn ns-btn--tienda" href="<?= e(url('crear-tienda')) ?>">🛠️ Empezar gratis ahora</a>
+    <a class="b3d b3d--granate" href="<?= e(url('crear-tienda')) ?>"><span>🛠️ Empezar gratis ahora</span></a>
   </div>
 
   <?php // 🎁 LA OFERTA SIN RIESGO: los números son los de includes/config_supremo.php
@@ -156,7 +158,7 @@ nosotros_area_css();
   <div class="ns-cierre">
     <h3>¿Empezamos hoy?</h3>
     <p>Publica tu negocio gratis y en minutos: la Inteligencia Artificial arma la tienda por ti.</p>
-    <a class="ns-btn ns-btn--claro" href="<?= e(url('crear-tienda')) ?>">🛠️ Crear mi tienda gratis</a>
+    <a class="b3d b3d--crema" href="<?= e(url('crear-tienda')) ?>"><span>🛠️ Crear mi tienda gratis</span></a>
   </div>
 
 </div>

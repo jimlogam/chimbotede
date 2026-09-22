@@ -44,15 +44,16 @@ nosotros_area_css();
   <?= nosotros_area_menu('novedades') ?>
 
   <div class="ns-nov">
-    <?php foreach ($novedades as $nv): ?>
-      <div class="ns-nov__i">
+    <?php foreach ($novedades as $i => $nv): ?>
+      <div class="ns-nov__i" style="<?= e(nosotros_tono($i)) ?>">
         <span class="ns-nov__ico" aria-hidden="true"><?= $nv[0] ?></span>
         <div>
           <p class="ns-nov__t"><?= e($nv[1]) ?></p>
           <?php // El texto lleva <b> a propósito (lo escribimos nosotros, no viene de fuera). ?>
           <p class="ns-nov__p"><?= $nv[2] ?></p>
           <?php if ($nv[3] !== '' && $nv[4] !== ''): ?>
-            <a class="ns-nov__a" href="<?= e(url($nv[4])) ?>"><?= e($nv[3]) ?> →</a>
+            <a class="b3d b3d--sm" style="<?= e(nosotros_tono_boton($i)) ?>"
+               href="<?= e(url($nv[4])) ?>"><span><?= e($nv[3]) ?> →</span></a>
           <?php endif; ?>
         </div>
       </div>
@@ -62,7 +63,7 @@ nosotros_area_css();
   <div class="ns-cierre">
     <h3>Todo esto, desde el plan gratis</h3>
     <p>La Inteligencia Artificial, la ubicación GPS y las estadísticas vienen incluidas en el plan Gratis.</p>
-    <a class="ns-btn ns-btn--claro" href="<?= e(url('precios')) ?>">💰 Ver nuestros 5 planes</a>
+    <a class="b3d b3d--crema" href="<?= e(url('precios')) ?>"><span>💰 Ver nuestros 5 planes</span></a>
   </div>
 
 </div>

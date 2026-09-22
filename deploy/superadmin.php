@@ -8,7 +8,7 @@
  *   postulantes -> candidatos de "Trabaja con nosotros"
  *   tiendas     -> listar y eliminar negocios que violen políticas
  *   productos   -> listar y eliminar productos/servicios
- *   usuarios    -> listar, suspender o eliminar cuentas
+ *   usuarios    -> crear, listar, suspender o eliminar cuentas
  * Optimizado para móvil.
  */
 require_once __DIR__ . '/config.php';
@@ -115,6 +115,137 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("DELETE FROM directorio_historial_busqueda WHERE usuario_id=?")->execute([$id]);
         $pdo->prepare("DELETE FROM directorio_usuarios WHERE id=?")->execute([$id]);
         flash('Cuenta eliminada. Sus negocios quedaron sin dueño.', 'exito');
+    } elseif ($accion === 'usuario_crear') {
+        // ➕ CREAR USUARIO A MANO (2026-09-21, orden del jefe: «crea usuarios»).
+        // Hasta hoy las cuentas SOLO nacían solas (registro, Google, la invitación de tienda o
+        // El maestro 🛠️) y el jefe no tenía ninguna puerta para crear una: la pestaña 👥 Usuarios
+        // únicamente administraba las que ya existían (premium, suspender, clave, eliminar).
+        // Se entra **con el correo o con el número de WhatsApp** (igual que `login()`): si se deja
+        // el correo en blanco y hay teléfono, el correo interno es `<numero>@dechimbote.com`, que es
+        // el formato que ya usa todo el sitio para las cuentas de tienda.
+        // La clave: si el jefe la escribe se usa esa; si no, se genera (3 letras + 1 número, como
+        // El maestro) y se muestra **UNA sola vez** abajo, con el mensaje listo para WhatsApp.
+        $u_nombre = trim((string)($_POST['u_nombre'] ?? ''));
+        $u_email  = trim((string)($_POST['u_email'] ?? ''));
+        $u_tel    = (string)preg_replace('/\D+/', '', (string)($_POST['u_telefono'] ?? ''));
+        $u_tipo   = (string)($_POST['u_tipo'] ?? 'cliente');
+        $u_clave  = trim((string)($_POST['u_clave'] ?? ''));
+        if (!in_array($u_tipo, ['cliente', 'dueno', 'admin'], true)) $u_tipo = 'cliente';
+
+        $errores = [];
+        if (mb_strlen($u_nombre) < 2) $errores[] = 'Escribe el nombre de la cuenta (al menos 2 letras).';
+        if ($u_email === '' && $u_tel === '') $errores[] = 'Ponle un correo o un número de WhatsApp: es con lo que va a entrar.';
+        if ($u_email !== '' && !filter_var($u_email, FILTER_VALIDATE_EMAIL)) $errores[] = 'Ese correo no es válido.';
+        if ($u_tel !== '' && strlen($u_tel) < 6) $errores[] = 'Ese número de WhatsApp no parece válido.';
+        if ($u_clave !== '' && strlen($u_clave) < 6) $errores[] = 'La contraseña debe tener al menos 6 caracteres (o déjala en blanco y la genero yo).';
+
+        if (empty($errores) && $u_email === '') $u_email = $u_tel . '@dechimbote.com';
+
+        if (empty($errores)) {
+            // ⚠️ LA TRAMPA QUE COSTÓ UN ERROR 500 (2026-09-21, comprobado con sonda): NO se compara
+            // un parámetro contra un literal en el SQL (`? <> ''`). MariaDB contesta
+            // «Illegal mix of collations (utf8mb4_general_ci,COERCIBLE) and (utf8mb4_unicode_ci,COERCIBLE)
+            // for operation '<>'» y la página se cae con 500. La decisión se toma en PHP (lo mismo que
+            // ya se aprendió en includes/telegram_subs.php), y de paso va en try/catch: una consulta
+            // de más NUNCA puede tumbar el alta.
+            try {
+                $existe = false;
+                if ($u_tel !== '') {
+                    $ya = $pdo->prepare("SELECT id, nombre FROM directorio_usuarios WHERE telefono = ? LIMIT 1");
+                    $ya->execute([$u_tel]);
+                    $existe = $ya->fetch();
+                }
+                if (!$existe) {
+                    $ya = $pdo->prepare("SELECT id, nombre FROM directorio_usuarios WHERE email = ? LIMIT 1");
+                    $ya->execute([$u_email]);
+                    $existe = $ya->fetch();
+                }
+                if ($existe) {
+                    $errores[] = 'Ya existe una cuenta con ese correo o ese número: «' . (string)$existe['nombre'] . '» (#' . (int)$existe['id'] . ').';
+                }
+            } catch (Throwable $e) {
+                error_log('usuario_crear (duplicado): ' . $e->getMessage());   // no se frena el alta
+            }
+        }
+
+        if (!empty($errores)) {
+            foreach ($errores as $err) flash($err, 'error');
+        } else {
+            $clave  = $u_clave !== '' ? $u_clave : clave_generar();
+            $hash   = password_hash($clave, PASSWORD_BCRYPT, ['cost' => defined('HASH_COST') ? HASH_COST : 10]);
+            $activo = isset($_POST['u_activo']) ? 1 : 0;   // marcado = ya puede entrar
+            try {
+                $pdo->prepare("INSERT INTO directorio_usuarios (nombre, email, password_hash, telefono, tipo, activo)
+                               VALUES (?,?,?,?,?,?)")
+                    ->execute([$u_nombre, $u_email, $hash, ($u_tel !== '' ? $u_tel : null), $u_tipo, $activo]);
+                $nuevo_id = (int)$pdo->lastInsertId();
+
+                // 🔔 Aviso al jefe (el mismo canal que usan las otras cuentas nuevas)
+                aviso('usuario_nuevo', [
+                    'nombre'     => $u_nombre,
+                    'email'      => $u_email,
+                    'via'        => 'creada a mano en Súper Admin (' . $u_tipo . ($u_tel !== '' ? ' · WhatsApp ' . $u_tel : '') . ')',
+                    'usuario_id' => $nuevo_id,
+                    'total'      => (int)$pdo->query('SELECT COUNT(*) FROM directorio_usuarios')->fetchColumn(),
+                    'clave'      => 'user:' . $u_email,
+                    'resumen'    => 'alta manual: ' . $u_email,
+                ]);
+
+                // 🔑 La clave se muestra UNA sola vez (mismo cartel que «Restablecer contraseña»),
+                //    con su mensaje listo para copiar y el botón verde de WhatsApp.
+                $usuario_visible = ($u_tel !== '' ? $u_tel : $u_email);
+                $mensaje = implode("\n", [
+                    'Hola 👋 Te escribo de dechimbote.com.',
+                    'Ya creé tu cuenta' . ($u_tipo === 'dueno' ? ' de dueño de tienda 🏪' : ($u_tipo === 'admin' ? ' de administrador 🔐' : ' 🎉')) . '.',
+                    '🔑 Tu usuario es ' . ($u_tel !== '' ? 'tu número de WhatsApp' : 'tu correo') . ': ' . $usuario_visible,
+                    '🔒 Tu contraseña es: ' . $clave,
+                    '👉 Entra aquí: ' . url('login.php'),
+                    '⚠️ Guárdala AHORA en este chat: no se vuelve a mostrar.',
+                ]);
+                $_SESSION['clave_nueva'] = [
+                    'ok'       => true,
+                    'nuevo'    => true,          // el cartel cambia de texto (es cuenta nueva, no cambio de clave)
+                    'clave'    => $clave,
+                    'nombre'   => $u_nombre,
+                    'usuario'  => $usuario_visible,
+                    'telefono' => $u_tel,
+                    'email'    => $u_email,
+                    'tienda'   => '',
+                    'mensaje'  => $mensaje,
+                    'wa'       => clave_whatsapp_url(['usuario' => $usuario_visible, 'telefono' => $u_tel, 'clave' => $clave, 'tienda' => '']),
+                ];
+                flash('➕ Cuenta creada: ' . $u_nombre . ' (' . $u_tipo . '). La clave está abajo, para copiarla o mandársela por WhatsApp.', 'exito');
+            } catch (Throwable $e) {
+                error_log('usuario_crear: ' . $e->getMessage());
+                flash('No pude crear la cuenta: ' . $e->getMessage(), 'error');
+            }
+        }
+        redirect('superadmin.php?seccion=usuarios');
+    } elseif ($accion === 'usuario_rol') {
+        // 🎭 CAMBIAR EL ROL DE UNA CUENTA (2026-09-21, orden del jefe: «cambiale el rol a admin»).
+        // Antes el rol SOLO se podía poner al crear la cuenta: no había ninguna forma de cambiarlo
+        // después. Ahora cada fila trae su selector (cliente · dueño · admin) con este botón.
+        $tipo_nuevo = (string)($_POST['tipo'] ?? '');
+        $st = $pdo->prepare("SELECT id, nombre, tipo FROM directorio_usuarios WHERE id = ? LIMIT 1");
+        $st->execute([$id]);
+        $u_rol = $st->fetch();
+        if (!$u_rol) {
+            flash('No encontré esa cuenta.', 'error');
+        } elseif (!in_array($tipo_nuevo, ['cliente', 'dueno', 'admin'], true)) {
+            flash('Ese rol no existe (son cliente, dueño y admin).', 'error');
+        } else {
+            // 🛡️ Red de seguridad: el sitio NUNCA se queda sin administrador activo (si no, nadie
+            // podría volver a entrar al Súper Admin). Para dejar sin rol al último admin hay que
+            // crear antes otro.
+            $n_admin = (int)$pdo->query("SELECT COUNT(*) FROM directorio_usuarios WHERE tipo = 'admin' AND activo = 1")->fetchColumn();
+            if ((string)$u_rol['tipo'] === 'admin' && $tipo_nuevo !== 'admin' && $n_admin <= 1) {
+                flash('«' . (string)$u_rol['nombre'] . '» es el ÚNICO administrador activo: si le quitas el rol, nadie podría volver a entrar al Súper Admin. Crea otro admin primero.', 'error');
+            } else {
+                $pdo->prepare("UPDATE directorio_usuarios SET tipo = ? WHERE id = ?")->execute([$tipo_nuevo, $id]);
+                flash('🎭 «' . (string)$u_rol['nombre'] . '» ahora es ' . ($tipo_nuevo === 'dueno' ? 'dueño de tienda' : $tipo_nuevo) . '.', 'exito');
+            }
+        }
+        redirect('superadmin.php?seccion=usuarios');
     } elseif ($accion === 'usuario_plan') {
         $plan = (($_POST['plan'] ?? '') === PLAN_PREMIUM) ? PLAN_PREMIUM : PLAN_GRATIS;
         $dias = max(0, (int)($_POST['dias'] ?? 0));
@@ -454,6 +585,10 @@ if ($seccion === 'resumen') {
         $usuarios = $pdo->query("SELECT id, nombre, email, tipo, activo, ultimo_login, creado_en FROM directorio_usuarios ORDER BY id")->fetchAll();
         foreach ($usuarios as &$u) { $u['plan'] = PLAN_GRATIS; $u['plan_hasta'] = null; } unset($u);
     }
+    // 🛡️ Cuántos administradores ACTIVOS hay: es lo que protege al sitio de quedarse sin ninguno
+    // cuando se cambia un rol (ver la acción `usuario_rol`).
+    $admins_activos = 0;
+    foreach ($usuarios as $uu) { if (($uu['tipo'] ?? '') === 'admin' && !empty($uu['activo'])) $admins_activos++; }
     // 🔑 LOS PEDIDOS DE «OLVIDÉ MI CONTRASEÑA» (2026-09-16): salen arriba de la lista, con su botón.
     $claves_pend = claves_pendientes(60);
     // 🔑 Y la clave recién generada: se lee de la sesión y se BORRA (se muestra una sola vez).
@@ -713,11 +848,16 @@ include __DIR__ . '/includes/header.php';
           // con el botón verde para mandársela al dueño por WhatsApp con el mensaje ya escrito. ?>
     <?php if (!empty($clave_nueva) && !empty($clave_nueva['clave'])): ?>
       <div class="sa-card" style="border-left:5px solid #16a34a;margin-bottom:16px">
-        <h3 style="font-size:16px">🔑 Contraseña nueva para <?= e((string)$clave_nueva['nombre']) ?></h3>
+        <?php $cn_nueva = !empty($clave_nueva['nuevo']); // ➕ cuenta recién creada a mano: mismo cartel, otro texto ?>
+        <h3 style="font-size:16px"><?= $cn_nueva ? '➕ Cuenta creada: ' . e((string)$clave_nueva['nombre']) : '🔑 Contraseña nueva para ' . e((string)$clave_nueva['nombre']) ?></h3>
         <p class="mini" style="margin:4px 0 10px">
           ⚠️ <b>Se muestra UNA sola vez.</b> Mándasela ahora (o cópiala): después ya no se puede leer.
           <?php if (!empty($clave_nueva['tienda'])): ?>· 🏪 <?= e((string)$clave_nueva['tienda']) ?><?php endif; ?>
-          · 🔒 Se cerraron sus sesiones abiertas, así que tiene que entrar de nuevo.
+          <?php if ($cn_nueva): ?>
+            · 🆕 Cuenta nueva: ya puede entrar con esa clave.
+          <?php else: ?>
+            · 🔒 Se cerraron sus sesiones abiertas, así que tiene que entrar de nuevo.
+          <?php endif; ?>
         </p>
 
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
@@ -794,6 +934,46 @@ include __DIR__ . '/includes/header.php';
       </div>
     <?php endif; ?>
 
+    <?php // ➕ CREAR USUARIO (2026-09-21): la pestaña solo administraba las cuentas que ya existían
+          // (nacían solas por registro, Google, la invitación de tienda o El maestro 🛠️), así que
+          // esta es la puerta para crearlas a mano. Se entra con el correo O con el WhatsApp. ?>
+    <div class="sa-card" style="margin-bottom:16px">
+      <h3 style="font-size:16px">➕ Crear usuario</h3>
+      <p class="mini" style="margin:4px 0 10px">
+        La cuenta entra <b>con el correo o con el número de WhatsApp</b> (el que le pongas). Si dejas
+        la contraseña en blanco se genera una (3 letras y 1 número) y sale aquí abajo,
+        <b>una sola vez</b>, con el mensaje listo para mandárselo.
+      </p>
+      <form method="post" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;align-items:end">
+        <?= csrf_campo() ?>
+        <input type="hidden" name="accion" value="usuario_crear">
+        <label class="mini">Nombre (de la persona o de la tienda)
+          <input type="text" name="u_nombre" required maxlength="80" style="width:100%;font-size:16px;padding:9px;border:1px solid var(--color-borde);border-radius:8px">
+        </label>
+        <label class="mini">Correo (si va a entrar con correo)
+          <input type="email" name="u_email" maxlength="120" placeholder="nombre@correo.com" style="width:100%;font-size:16px;padding:9px;border:1px solid var(--color-borde);border-radius:8px">
+        </label>
+        <label class="mini">WhatsApp (si va a entrar con su número)
+          <input type="tel" name="u_telefono" maxlength="15" placeholder="943810204" style="width:100%;font-size:16px;padding:9px;border:1px solid var(--color-borde);border-radius:8px">
+        </label>
+        <label class="mini">Rol
+          <select name="u_tipo" style="width:100%;font-size:16px;padding:9px;border:1px solid var(--color-borde);border-radius:8px">
+            <option value="cliente">cliente (busca y compra)</option>
+            <option value="dueno">dueño de tienda</option>
+            <option value="admin">admin (acceso total)</option>
+          </select>
+        </label>
+        <label class="mini">Contraseña (en blanco = la genero yo)
+          <input type="text" name="u_clave" maxlength="40" placeholder="3 letras y 1 número" style="width:100%;font-size:16px;padding:9px;border:1px solid var(--color-borde);border-radius:8px">
+        </label>
+        <label class="mini" style="display:flex;align-items:center;gap:8px;min-height:40px">
+          <input type="checkbox" name="u_activo" value="1" checked style="width:18px;height:18px">
+          Puede entrar ya (activo)
+        </label>
+        <button class="btn-mini b-ok" style="padding:12px 16px;font-size:15px">➕ Crear usuario</button>
+      </form>
+    </div>
+
     <div class="sa-table-wrap"><table class="sa-table">
       <thead><tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Plan</th><th>Estado</th><th></th></tr></thead>
       <tbody>
@@ -802,7 +982,24 @@ include __DIR__ . '/includes/header.php';
         <tr>
           <td><?= $u['id'] ?></td>
           <td><b><?= e($u['nombre']) ?></b><div class="mini"><?= e($u['email']) ?></div></td>
-          <td><span class="badge-est <?= $u['tipo']==='admin'?'b-aprobado':($u['tipo']==='dueno'?'b-nuevo':'b-pendiente') ?>"><?= e($u['tipo']) ?></span></td>
+          <td>
+            <span class="badge-est <?= $u['tipo']==='admin'?'b-aprobado':($u['tipo']==='dueno'?'b-nuevo':'b-pendiente') ?>"><?= e($u['tipo']) ?></span>
+            <?php // 🎭 EL ROL SE PUEDE CAMBIAR EN CUALQUIER MOMENTO (2026-09-21). Solo se esconde en el
+                  // último administrador activo: dejar el sitio sin admin no tendría vuelta atrás. ?>
+            <?php if ($u['tipo'] !== 'admin' || $admins_activos > 1): ?>
+              <form method="post" style="display:flex;gap:4px;align-items:center;margin-top:6px">
+                <?= csrf_campo() ?><input type="hidden" name="accion" value="usuario_rol"><input type="hidden" name="id" value="<?= $u['id'] ?>">
+                <select name="tipo" style="padding:5px;border:1px solid var(--color-borde);border-radius:6px;font-size:12px">
+                  <option value="cliente" <?= $u['tipo']==='cliente'?'selected':'' ?>>cliente</option>
+                  <option value="dueno" <?= $u['tipo']==='dueno'?'selected':'' ?>>dueño</option>
+                  <option value="admin" <?= $u['tipo']==='admin'?'selected':'' ?>>admin</option>
+                </select>
+                <button class="btn-mini b-ghost" title="Cambiar el rol de esta cuenta">🎭 Cambiar rol</button>
+              </form>
+            <?php else: ?>
+              <div class="mini" style="margin-top:4px">🔒 único admin activo</div>
+            <?php endif; ?>
+          </td>
           <td>
             <span class="badge-est <?= $es_p ? 'b-aprobado' : 'b-pendiente' ?>"><?= $es_p ? '⭐ premium' : 'gratis' ?></span>
             <?php if ($es_p && !empty($u['plan_hasta'])): ?><div class="mini">hasta <?= date('d/m/Y', strtotime($u['plan_hasta'])) ?></div><?php endif; ?>

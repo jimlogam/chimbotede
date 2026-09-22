@@ -967,10 +967,13 @@ if (!function_exists('pedido_card_html')) {
         }
 
         // Los botones del vendedor.
+        // ⛔ SIN ANCLAS (orden del jefe, 2026-09-21): aquí había un SEGUNDO botón «💬 Ofrecer mi precio»
+        //    que era un `href="#ofrecer-<id>"` (saltaba al formulario de más abajo, en la misma ficha).
+        //    El formulario ya se abre solo con su propio `<details><summary>` (unas líneas más abajo),
+        //    así que ese botón era un duplicado con ancla: se retiró y queda el de verdad.
         $h .= '<div class="psv-card__acciones">';
         if ($estado !== 'conseguido' || $props > 0) {
             $h .= '<a class="psv-btn psv-btn--principal" href="' . e($crear) . '">🛠️ Yo lo vendo</a>';
-            $h .= '<a class="psv-btn" href="#ofrecer-' . (int)$p['id'] . '">💬 Ofrecer mi precio</a>';
         }
         $h .= '</div>';
 
@@ -1105,7 +1108,8 @@ if (!function_exists('pedido_publicado_html')) {
                    . '. Si alguno lo tiene, te escribe.</p>';
         }
         $h .= '<div class="psv-aviso__acc">';
-        $h .= '<a class="psv-aviso__btn" href="' . e(pedido_url($slug) . '#pedirwa-' . $id) . '">📲 Dejo mi WhatsApp para que me escriban</a>';
+        // ⛔ Sin ancla: se entra a la página del encargo (donde está su formulario) y se abre ahí.
+        $h .= '<a class="psv-aviso__btn" href="' . e(pedido_url($slug)) . '">📲 Dejo mi WhatsApp para que me escriban</a>';
         $h .= '<a class="psv-aviso__btn psv-aviso__btn--suave" href="' . e(url('en-vivo')) . '">Ver los encargos</a>';
         $h .= '</div></div>';
         return $h;

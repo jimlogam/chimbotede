@@ -128,7 +128,7 @@ $categorias = $categorias ?? obtener_categorias();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= url('assets/css/base.css') ?>?v=6">
-    <link rel="stylesheet" href="<?= url('assets/css/components.css') ?>?v=27">
+    <link rel="stylesheet" href="<?= url('assets/css/components.css') ?>?v=28">
     <link rel="stylesheet" href="<?= url('assets/css/plantilla-a.css') ?>?v=4">
     <link rel="stylesheet" href="<?= url('assets/css/plantilla-b.css') ?>?v=3">
     <link rel="stylesheet" href="<?= url('assets/css/plantilla-c.css') ?>?v=3">

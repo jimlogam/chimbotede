@@ -62,14 +62,14 @@ nosotros_area_css();
             de Chimbote, Nuevo Chimbote y Santa.</li>
       </ol>
       <div class="ns-atajos">
-        <a href="<?= e(url('buscar.php')) ?>">🔎 Buscar negocios</a>
-        <a href="<?= e(url('rubros')) ?>">🏷️ Ver todos los rubros</a>
-        <a href="<?= e(url('noticias')) ?>">📰 Noticias</a>
-        <a href="<?= e(url('empleos')) ?>">💼 Empleos</a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('buscar.php')) ?>"><span>🔎 Buscar negocios</span></a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('rubros')) ?>"><span>🏷️ Ver todos los rubros</span></a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('noticias')) ?>"><span>📰 Noticias</span></a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('empleos')) ?>"><span>💼 Empleos</span></a>
       </div>
     </div>
 
-    <div class="ns-card">
+    <div class="ns-card" style="<?= e(nosotros_tono(3)) ?>">
       <h3>🏪 Si tienes un negocio y quieres vender</h3>
       <ol class="ns-pasos">
         <li><b>Publica tu tienda gratis.</b> Toca <b>«🛠️ Crear mi tienda»</b> y sube unas fotos de tu
@@ -85,10 +85,10 @@ nosotros_area_css();
             manejarlo tú.</li>
       </ol>
       <div class="ns-atajos">
-        <a href="<?= e(url('crear-tienda')) ?>">🛠️ Crear mi tienda con IA</a>
-        <a href="<?= e(url('caminante/')) ?>">📸 Agregar con la cámara</a>
-        <a href="<?= e(url('reclamar')) ?>">🙋 Reclamar mi negocio</a>
-        <a href="<?= e(url('panel.php')) ?>">👤 Mi panel</a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('crear-tienda')) ?>"><span>🛠️ Crear mi tienda con IA</span></a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('caminante/')) ?>"><span>📸 Agregar con la cámara</span></a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('reclamar')) ?>"><span>🙋 Reclamar mi negocio</span></a>
+        <a class="b3d b3d--sm b3d--gris" href="<?= e(url('panel.php')) ?>"><span>👤 Mi panel</span></a>
       </div>
     </div>
   </div>
@@ -107,7 +107,7 @@ nosotros_area_css();
   <div class="ns-cierre">
     <h3>¿Y si quieres vender?</h3>
     <p>Publica tu negocio gratis y en minutos: la Inteligencia Artificial arma la tienda por ti.</p>
-    <a class="ns-btn ns-btn--claro" href="<?= e(url('crear-tienda')) ?>">🛠️ Crear mi tienda gratis</a>
+    <a class="b3d b3d--crema" href="<?= e(url('crear-tienda')) ?>"><span>🛠️ Crear mi tienda gratis</span></a>
   </div>
 
 </div>

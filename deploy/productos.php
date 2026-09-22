@@ -110,7 +110,7 @@ if (!$__desbloqueado) {
         </form>
         <p style="font-size:13px;color:#6b7280;margin:14px 0 0">
             <a href="<?= e(url('mi-tienda.php?n=' . $negocio_id)) ?>">← Volver a editar mi tienda</a>
-            · <a href="<?= e(url('panel.php#mis-negocios')) ?>">Mi panel</a>
+            · <a href="<?= e(url('panel.php')) ?>">Mi panel</a>
         </p>
     </div>
     <?php

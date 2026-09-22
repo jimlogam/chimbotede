@@ -589,6 +589,68 @@ envíos**; el ↺ del conteo **no** la borra.
 > 🔒 **Tabla de solo-panel:** guarda claves en claro y por eso es del Súper Admin (`/includes/`
 > está bloqueado por `.htaccess` con `Redirect403`; la tabla no se expone por ninguna API).
 
+## 4.5 👥 USUARIOS — ➕ CREAR USUARIO (2026-09-21, orden del jefe: «crea usuarios»)
+
+**El problema:** la pestaña 👥 Usuarios **solo administraba** las cuentas que ya existían (⭐ Premium ·
+⏸ Suspender · 🔑 Restablecer contraseña · 🗑 Eliminar). Las cuentas nacían **solas**, por 4 puertas:
+`registro.php`, `google_callback.php`, la invitación de tienda (`includes/invitaciones.php`) y El maestro 🛠️
+(`includes/tienda_ia.php`). El jefe no tenía **ninguna** puerta para crearlas a mano.
+
+**Lo que se agregó** (todo en `deploy/superadmin.php`, sección `usuarios`):
+- Acción POST **`usuario_crear`** + un formulario arriba de la tabla (Nombre · Correo · WhatsApp · Rol ·
+  Contraseña · casilla «Puede entrar ya»).
+- **Se entra con el correo O con el número de WhatsApp** (igual que `login()`): si se deja el correo en
+  blanco y hay teléfono, el correo interno es `<numero>@dechimbote.com` (el formato de las cuentas de tienda).
+- **La clave:** si el jefe la escribe se usa esa; si la deja en blanco se genera con `clave_generar()`
+  (3 letras + 1 número, como El maestro) y **se muestra UNA sola vez** con el mismo cartel de
+  «Restablecer contraseña» (la clave `nuevo => true` cambia el texto del cartel a «➕ Cuenta creada») más el
+  mensaje listo para copiar y el botón verde de WhatsApp.
+- Avisa al jefe por `aviso('usuario_nuevo', …)`, como las otras altas.
+- Roles: `cliente` · `dueno` · `admin` (es exactamente el `enum` de `directorio_usuarios.tipo`).
+
+### 🎭 CAMBIAR EL ROL DESPUÉS (2026-09-21, orden del jefe: «cambiale el rol a admin»)
+
+El rol **antes solo se podía poner al crear la cuenta**: no había ninguna forma de cambiarlo después.
+Ahora **cada fila de la tabla trae su selector** (cliente · dueño · admin) + botón **🎭 Cambiar rol**
+(acción POST **`usuario_rol`**, en la columna **Rol**).
+
+- 🛡️ **Red de seguridad:** al **último administrador activo** no se le puede quitar el rol (el selector
+  se oculta y el servidor lo rechaza con un aviso): si no, **nadie podría volver a entrar al Súper Admin**.
+  Para dejarlo sin rol hay que crear antes otro admin. El conteo vive en `$admins_activos`.
+- Para cambiar un rol **sin abrir el navegador** (o desde fuera) está la sonda temporal **`__us_rol.php`**:
+  `python __sonda_run.py __us_rol.php PON_AQUI_LA_CLAVE_DE_LAS_SONDAS x "&email=<correo>&tipo=admin"` → devuelve
+  el antes y el después y cuántos admins activos quedan (se borra del servidor en el mismo paso).
+
+### 🔴 LA TRAMPA QUE COSTÓ UN ERROR 500 (leer antes de escribir consultas nuevas)
+
+La primera versión comprobaba el duplicado con **un solo SQL**:
+`... WHERE email = ? OR (? <> '' AND telefono = ?)`. En el hosting eso **revienta**:
+
+```text
+SQLSTATE[HY000]: General error: 1267 Illegal mix of collations
+(utf8mb4_general_ci,COERCIBLE) and (utf8mb4_unicode_ci,COERCIBLE) for operation '<>'
+```
+
+MariaDB no deja comparar **dos literales/parámetros** con collations distintas (el parámetro vacío contra
+`''`), la `PDOException` **no estaba en try/catch** y la página se caía con **500**. Es la **misma trampa**
+ya anotada en `includes/telegram_subs.php` (allí: «el nombre se decide en PHP, NO con `IF(?, '', …)`»).
+
+**Regla:** **ninguna comparación entre parámetros o literales dentro del SQL**; la decisión se toma en
+**PHP** (primero la consulta por `telefono`; si no hay resultado, la consulta por `email`) y **toda consulta
+de apoyo va en `try/catch`** para que no pueda tumbar el alta.
+
+**Cómo se encontró sin ver los logs:** sonda temporal **`__us_diag.php`** —
+`python __sonda_run.py __us_diag.php PON_AQUI_LA_CLAVE_DE_LAS_SONDAS x ""` — que imprime `SHOW COLUMNS` de la tabla y
+prueba **cada pieza por separado**: la consulta del duplicado, el INSERT completo y el INSERT sin `telefono`
+(**dentro de una transacción que se deshace**, así no deja basura) y las funciones del módulo de claves.
+El informe queda en `__us_diag_resultado.json`.
+
+**Probado de verdad (2026-09-21):** cuenta inventada **«Prueba IA Chimbote» /
+`prueba.ia.20260921@test.com` / clave `Prueba2026`** → salió el cartel «➕ Cuenta creada» y el **login quedó
+comprobado** (POST a `/login.php` → **302**, y `/panel.php` → **200** con esa sesión).
+
+---
+
 ## 5) CÓMO AGREGAR UNA SECCIÓN (PESTAÑA) NUEVA
 
 1. **Menú:** agregar una `<a>` dentro de `.sa-nav` en `deploy/superadmin.php`, con su icono, su texto y `href="<?= url('superadmin.php?seccion=<nombre>') ?>"`, y la clase `activo` cuando `$seccion === '<nombre>'`. No hay que tocar el CSS: la cuadrícula abre fila sola.

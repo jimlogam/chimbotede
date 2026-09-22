@@ -572,7 +572,8 @@ $tiene_ubi = ((string)$negocio['lat'] !== '' && $negocio['lat'] !== null
 <div class="mt">
     <p class="mt__migas">
         <a href="<?= e(url('panel.php')) ?>">Mi panel</a> ›
-        <a href="<?= e(url('panel.php#mis-negocios')) ?>">Mis negocios</a> ›
+        <?php // ⛔ SIN ANCLAS (orden del jefe, 2026-09-21): estos enlaces llevaban a `panel.php#mis-negocios`. ?>
+        <a href="<?= e(url('panel.php')) ?>">Mis negocios</a> ›
         <span>Editar</span>
     </p>
 
@@ -582,7 +583,7 @@ $tiene_ubi = ((string)$negocio['lat'] !== '' && $negocio['lat'] !== null
     <div class="mt__acciones">
         <a class="mt__b mt__b--wsp" href="<?= e(url_negocio((string)$negocio['slug'])) ?>" target="_blank" rel="noopener">👁️ Ver mi tienda</a>
         <a class="mt__b" href="<?= e(url('productos.php?n=' . $nid)) ?>">🛒 Mis productos (<?= $nproductos ?>)</a>
-        <a class="mt__b" href="<?= e(url('panel.php#mis-negocios')) ?>">← Volver al panel</a>
+        <a class="mt__b" href="<?= e(url('panel.php')) ?>">← Volver al panel</a>
     </div>
 
     <p class="mt__aviso">
@@ -1028,7 +1029,7 @@ $tiene_ubi = ((string)$negocio['lat'] !== '' && $negocio['lat'] !== null
 
     <p class="mt__ayuda" style="margin-top:16px">
         ¿Quieres borrar tu tienda? Se hace desde tu panel, con tu contraseña:
-        <a href="<?= e(url('panel.php#mis-negocios')) ?>">Mis negocios → 🗑️ Eliminar</a>.
+        <a href="<?= e(url('panel.php')) ?>">Mis negocios → 🗑️ Eliminar</a>.
     </p>
 </div>
 

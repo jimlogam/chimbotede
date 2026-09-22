@@ -44,43 +44,9 @@ if (!function_exists('nosotros_area_css')) {
    ========================================================================== */
 .ns-wrap{width:100%;max-width:none;margin:0;padding:12px 10px 40px}
 
-/* ===== BOTONES 3D (clase base que usan el área y la documentación) =====
-   El truco del volumen: una sombra sólida debajo (el «costado» de la tecla), un brillo
-   diagonal encima y las luces interiores (arriba claro, abajo oscuro). Al pulsar, la tecla
-   baja: la sombra se acorta y el botón se hunde. */
-.b3d{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:9px;
-  box-sizing:border-box;border:0;border-radius:12px;padding:13px 18px;font-family:inherit;
-  font-size:16px;font-weight:800;line-height:1.2;text-decoration:none;text-align:center;color:#fff;
-  cursor:pointer;
-  background:linear-gradient(180deg,var(--b3a,#9c1030) 0%,var(--b3b,#6d071a) 100%);
-  box-shadow:0 5px 0 0 var(--b3c,#3d040f),0 9px 18px rgba(0,0,0,.22),
-    inset 0 2px 0 rgba(255,255,255,.42),inset 0 -3px 0 rgba(0,0,0,.16);
-  transition:transform .1s ease,box-shadow .1s ease,filter .12s ease}
-.b3d::after{content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(112deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.10) 42%,rgba(255,255,255,0) 66%)}
-.b3d>span,.b3d>svg{position:relative;z-index:1}
-.b3d:hover{filter:brightness(1.07);transform:translateY(-1px);
-  box-shadow:0 6px 0 0 var(--b3c,#3d040f),0 12px 22px rgba(0,0,0,.26),
-    inset 0 2px 0 rgba(255,255,255,.45),inset 0 -3px 0 rgba(0,0,0,.16)}
-.b3d:active{transform:translateY(4px);
-  box-shadow:0 1px 0 0 var(--b3c,#3d040f),0 3px 8px rgba(0,0,0,.2),inset 0 2px 0 rgba(255,255,255,.3)}
-.b3d:focus-visible{outline:3px solid #fbd7a4;outline-offset:2px}
-/* Los colores de cada botón */
-.b3d--granate{--b3a:#9c1030;--b3b:#6d071a;--b3c:#3d040f}
-.b3d--naranja{--b3a:#f59e0b;--b3b:#c2410c;--b3c:#7c2d12}
-.b3d--wa{--b3a:#5ce08a;--b3b:#25d366;--b3c:#128c4a}
-.b3d--verde{--b3a:#22c55e;--b3b:#15803d;--b3c:#0b5227}
-.b3d--azul{--b3a:#3b82f6;--b3b:#1d4ed8;--b3c:#122e7c}
-.b3d--violeta{--b3a:#8b5cf6;--b3b:#6d28d9;--b3c:#42188c}
-.b3d--rosa{--b3a:#ec4899;--b3b:#be185d;--b3c:#7c0b3c}
-.b3d--crema{--b3a:#ffffff;--b3b:#f4ece6;--b3c:#cbb9ad;color:#6d071a}
-.b3d--gris{--b3a:#ffffff;--b3b:#f4f4f5;--b3c:#d4d4d8;color:#3f3f46}
-/* Tamaños: chico (los atajos) y ancho completo (los botones de acción) */
-.b3d--sm{padding:10px 14px;font-size:14.5px;border-radius:10px;
-  box-shadow:0 4px 0 0 var(--b3c,#d4d4d8),0 6px 12px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.42)}
-.b3d--sm:hover{box-shadow:0 5px 0 0 var(--b3c,#d4d4d8),0 9px 16px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.45)}
-.b3d--sm:active{transform:translateY(3px);box-shadow:0 1px 0 0 var(--b3c,#d4d4d8),0 2px 6px rgba(0,0,0,.16)}
-.b3d--full{width:100%}
+/* ===== LOS BOTONES 3D: la clase `.b3d` (con sus variantes de color y de tamaño) vive en la HOJA
+   COMÚN `assets/css/components.css`, porque la usan el área Nosotros Y las páginas de la
+   documentación. Aquí no se vuelve a definir: solo se usa. ===== */
 
 /* 🧭 EL MENÚ INTERNO DEL ÁREA: la barra que lleva de una sección a otra (sin anclas). */
 .ns-menu{display:flex;flex-wrap:wrap;gap:10px;background:#fff;border:1px solid var(--color-borde,#e6ded9);
