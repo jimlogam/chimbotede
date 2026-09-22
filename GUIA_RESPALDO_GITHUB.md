@@ -166,8 +166,13 @@ En GitHub: la pestaña **Commits** del repositorio. Y si se quiere comprobar un 
 - El sitio guarda **las últimas 14** copias en `__backups/` y las rota solo.
 - 🛠️ **`D:\RELAX\__bd_esquema.py`** es la herramienta que lee el `.sql.gz` y escribe el `ESQUEMA.sql`
   (uso: `python __bd_esquema.py [archivo.sql.gz] [salida.sql]`).
-- ⚠️ **`__sync_backup.py` no toca la base**: la carpeta `base_de_datos\` **no se copia ni se tapa** (el dump es
-  binario: si el sincronizador lo leyera como texto podría dañarlo). La base se sube aparte, con `git`.
+- ⚠️ **La base se sube aparte, con `git`**: `__sync_backup.py subir` solo copia `deploy\` y las guías `.md`,
+  así que **nunca sube ni actualiza la base** (eso es a mano, con la receta de arriba).
+- ⚠️ **Y ojo con esto:** el sincronizador, al tapar claves, **recorre TODA la carpeta del clon** (incluida
+  `base_de_datos\`) y lee el `.gz` como si fuera texto. Hasta hoy **no le ha hecho nada** (el dump va comprimido
+  y ningún valor coincide con las claves que busca), pero lo prudente sería **dejar la base fuera de su camino**
+  (una línea en `NO_COPIAR`). **El jefe decidió el 2026-09-21 no tocar el sincronizador**: queda anotado aquí
+  como riesgo conocido — si algún día el dump apareciera dañado después de un respaldo, mirar por aquí primero.
 
 ### Lo que el jefe decidió ese día (y hay que respetar)
 
