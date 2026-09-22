@@ -247,6 +247,7 @@ Prefijo `directorio_`. Tabla → los archivos que la consultan (así se sabe qu�
 | **`REGLAS_DE_ORO_PROYECTO.md`** | Las reglas del jefe y del proyecto. **Canónico.** |
 | **`GUIA_MAESTRA_CHIMBOTE_XYZ.md`** | Este archivo: contexto, mapa del sitio y de la BD. |
 | **`GUIA_DESPLIEGUE_Y_ENTORNO.md`** | Cómo se edita, valida, sube y verifica. Trampas del entorno. |
+| **`GUIA_RESPALDO_GITHUB.md`** | **El respaldo del sitio y de las guías en GitHub** (2026-09-21): `python D:\mi-sitio-web\__sync_backup.py subir` copia `D:\RELAX\deploy` + las guías, **tapa las claves**, revisa que no quede ninguna y que nada más haya cambiado, y hace commit/push al repositorio **`github.com/jimlogam/chimbotede`** (⚠️ **es PÚBLICO**, aunque su README diga «privada»). Ahí está el registro de cada subida. |
 | **`GUIA_CRONICA_Y_TRABAJO_DE_SESION.md`** | El flujo de trabajo de toda sesión, **qué se escribe y dónde (§2: solo en la guía del módulo — 🚫 sin crónicas por sesión ni guías por cliente, orden del jefe del 2026-09-14)** y cómo verificar **sin descargar el sitio entero** (HTTP ~0,7 s por página; **sin md5 desde el 2026-09-11 y sin respaldo del vivo desde el 2026-09-12**). El nombre del archivo es histórico. |
 
 > 🔓 **Regla vigente (2026-09-12):** **el hosting es de uso exclusivo de la IA.** El jefe nunca sube, edita
